@@ -1,5 +1,4 @@
 # AI-Based Job Candidate Screening System
-**Group 17 Project Prototype**
 
 This repository contains the prototype for an AI-Based Job Candidate Screening System. It is designed to automatically evaluate natural language candidate resumes against a natural language Job Description and score their suitability using advanced Natural Language Processing (NLP) techniques.
 
@@ -43,5 +42,4 @@ Our system goes far beyond standard keyword matching by implementing a **Hybrid 
 4. **Test the UI:**
    Open your browser and navigate to `http://127.0.0.1:5000`
 
-## 👥 Authors
-* Group 17
+
