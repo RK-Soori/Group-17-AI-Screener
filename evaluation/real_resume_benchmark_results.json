@@ -1,0 +1,177 @@
+{
+    "total_real_resumes_tested": 180,
+    "sample_categories": [
+        "Python Developer",
+        "Data Science",
+        "Java Developer",
+        "Database",
+        "Accountant",
+        "Food and Beverages",
+        "React Developer",
+        "Web Designing",
+        "DotNet Developer",
+        "Civil Engineer",
+        "Sales",
+        "DevOps",
+        "Network Security Engineer",
+        "Human Resources",
+        "Arts"
+    ],
+    "kpis": {
+        "target_hit_rate_percent": 35.0,
+        "false_positive_rate_percent": 0.0,
+        "non_technical_zero_rate_percent": 93.33,
+        "discrimination_gap_percent": 38.68
+    },
+    "tier_aggregates": [
+        {
+            "tier": "Adjacent (Mid Match)",
+            "count": 60,
+            "mean": 27.9225,
+            "median": 25.335,
+            "std": 13.402944354614075,
+            "min": 0.0,
+            "max": 61.88
+        },
+        {
+            "tier": "Irrelevant (Zero Match)",
+            "count": 60,
+            "mean": 0.7155,
+            "median": 0.0,
+            "std": 3.0683747285128447,
+            "min": 0.0,
+            "max": 20.0
+        },
+        {
+            "tier": "Target (High Match)",
+            "count": 60,
+            "mean": 39.39066666666667,
+            "median": 38.36,
+            "std": 17.10102196040913,
+            "min": 0.0,
+            "max": 72.01
+        }
+    ],
+    "category_breakdown": [
+        {
+            "candidate_category": "Accountant",
+            "count": 10,
+            "mean": 2.0,
+            "median": 0.0,
+            "min": 0.0,
+            "max": 20.0
+        },
+        {
+            "candidate_category": "Arts",
+            "count": 10,
+            "mean": 0.0,
+            "median": 0.0,
+            "min": 0.0,
+            "max": 0.0
+        },
+        {
+            "candidate_category": "Civil Engineer",
+            "count": 10,
+            "mean": 1.543,
+            "median": 0.0,
+            "min": 0.0,
+            "max": 10.05
+        },
+        {
+            "candidate_category": "Data Science",
+            "count": 10,
+            "mean": 32.370999999999995,
+            "median": 30.48,
+            "min": 2.66,
+            "max": 71.5
+        },
+        {
+            "candidate_category": "Database",
+            "count": 10,
+            "mean": 11.725,
+            "median": 10.86,
+            "min": 0.0,
+            "max": 25.78
+        },
+        {
+            "candidate_category": "DevOps",
+            "count": 10,
+            "mean": 52.553999999999995,
+            "median": 53.525,
+            "min": 38.62,
+            "max": 62.27
+        },
+        {
+            "candidate_category": "DotNet Developer",
+            "count": 10,
+            "mean": 39.425,
+            "median": 37.4,
+            "min": 26.33,
+            "max": 61.88
+        },
+        {
+            "candidate_category": "Food and Beverages",
+            "count": 10,
+            "mean": 0.0,
+            "median": 0.0,
+            "min": 0.0,
+            "max": 0.0
+        },
+        {
+            "candidate_category": "Human Resources",
+            "count": 10,
+            "mean": 0.0,
+            "median": 0.0,
+            "min": 0.0,
+            "max": 0.0
+        },
+        {
+            "candidate_category": "Java Developer",
+            "count": 30,
+            "mean": 30.668666666666663,
+            "median": 25.335,
+            "min": 15.71,
+            "max": 59.66
+        },
+        {
+            "candidate_category": "Network Security Engineer",
+            "count": 10,
+            "mean": 16.537,
+            "median": 20.105,
+            "min": 0.0,
+            "max": 26.02
+        },
+        {
+            "candidate_category": "Python Developer",
+            "count": 20,
+            "mean": 32.32,
+            "median": 31.735,
+            "min": 10.68,
+            "max": 52.72
+        },
+        {
+            "candidate_category": "React Developer",
+            "count": 10,
+            "mean": 56.539,
+            "median": 59.26,
+            "min": 33.27,
+            "max": 72.01
+        },
+        {
+            "candidate_category": "Sales",
+            "count": 10,
+            "mean": 0.75,
+            "median": 0.0,
+            "min": 0.0,
+            "max": 7.5
+        },
+        {
+            "candidate_category": "Web Designing",
+            "count": 10,
+            "mean": 38.082,
+            "median": 38.625,
+            "min": 28.82,
+            "max": 43.27
+        }
+    ]
+}
