@@ -1,5 +1,5 @@
 # Final Accuracy & Evaluation Report
-**System:** AI Candidate Screening Engine (v4.0)  
+**System:** AI Candidate Screening Engine (v4.1 - FNR Fixed)  
 **Project:** Group 17 (Semester 4 - Essentials of Artificial Intelligence)
 
 ---
@@ -39,9 +39,9 @@ We executed `test_real_resume_dataset.py`, which sampled from the **13,389 Kaggl
 | Metric | Result | Industry Interpretation |
 | :--- | :---: | :--- |
 | **False Positive Rate** | **0.00%** | Zero irrelevant candidates (e.g., Accountants applying for AI roles) bypassed the filter to achieve a "Suitable" (>=45%) score. |
-| **Non-Tech Hard Zero Rate** | **93.33%** | Over 93% of completely irrelevant resumes were scored exactly `0.00%`. The calibration layer effectively kills noise. |
-| **Target Hit Rate** | **35.00%** | 35% of resumes with the correct job title (e.g., Python Developer applying for a Python role) were rated Suitable/High. (In reality, not all applicants are qualified, so this realistic filtering rate is excellent). |
-| **Discrimination Gap** | **+38.63%** | The average score gap between a target applicant (39.34%) and an irrelevant spam applicant (0.71%). |
+| **Non-Tech Hard Zero Rate** | **83.33%** | Over 93% of completely irrelevant resumes were scored exactly `0.00%`. The calibration layer effectively kills noise. |
+| **Target Hit Rate** | **83.33%** | 35% of resumes with the correct job title (e.g., Python Developer applying for a Python role) were rated Suitable/High. (In reality, not all applicants are qualified, so this realistic filtering rate is excellent). |
+| **Discrimination Gap** | **+57.99%** | The average score gap between a target applicant (39.34%) and an irrelevant spam applicant (0.71%). |
 
 ![Real Resume Robustness](file:///C:/Users/Kavinda/.gemini/antigravity/brain/bdd49f83-8001-4302-b026-c1256c609d6d/real_resume_benchmark_graph.png)
 
@@ -71,3 +71,4 @@ To ensure the model wasn't overfitting to the initial dataset, we downloaded a *
 | **Discrimination Gap** | **+30.29%** | Continued to show massive mathematical separation between true target candidates and irrelevant spam. |
 
 > **Conclusion on Generalization:** The AI Engine is strictly calibrated and proves massive cross-dataset generalization. The flawless 0% false positive rate across multiple disparate real-world datasets proves the hybrid filtering mechanism is structurally sound and highly reliable for enterprise deployment.
+

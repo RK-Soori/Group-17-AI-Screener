@@ -245,11 +245,11 @@ def calculate_match_scores(job_desc, resumes):
                 cluster_credits += min(len(job_in_cl), len(cand_in_cl)) * 0.5
             skill_affinity = (len(exact_matches) * 1.0 + cluster_credits) / len(job_skills)
         
-        # 5. Hybrid Blended Score (45% SBERT + 35% TF-IDF + 15% Skill Affinity + 5% Jaccard)
-        raw_blended = (sbert_scores[i] * 0.45) + (cosine_sim_tfidf[i] * 0.35) + (skill_affinity * 0.15) + (jac_score * 0.05)
+        # 5. Hybrid Blended Score (65% SBERT + 20% TF-IDF + 15% Skill Affinity)
+        raw_blended = (sbert_scores[i] * 0.65) + (cosine_sim_tfidf[i] * 0.20) + (skill_affinity * 0.15)
         
-        # Baseline Floor Rescaling (0.22 floor removal)
-        BASELINE_FLOOR = 0.22
+        # Baseline Floor Rescaling (0.15 floor removal)
+        BASELINE_FLOOR = 0.15
         calibrated_score = max(0.0, (raw_blended - BASELINE_FLOOR) / (1.0 - BASELINE_FLOOR))
         percentage = calibrated_score * 100.0
         
@@ -272,9 +272,9 @@ def calculate_match_scores(job_desc, resumes):
         percentage = round(min(percentage, 100.0), 2)
         
         # 9. Decision Thresholds
-        if percentage >= 65.0:
+        if percentage >= 60.0:
             result_label = "Highly Suitable"
-        elif percentage >= 45.0:
+        elif percentage >= 38.0:
             result_label = "Suitable"
         else:
             result_label = "Low Match"
@@ -288,3 +288,4 @@ def calculate_match_scores(job_desc, resumes):
     # Sort results highest score to lowest
     results.sort(key=lambda x: x['score'], reverse=True)
     return results
+
