@@ -58,7 +58,7 @@
                     <th class="px-6 py-4 font-medium text-center">Feedback</th>
                 </tr>
             </thead>
-            <tbody class="divide-y divide-gray-100">
+            <tbody class="divide-y divide-slate-200">
                 {% for result in results %}
                 <tr class="hover:bg-slate-50 transition-colors">
                     <!-- Rank -->
@@ -66,11 +66,11 @@
                         {% if loop.index == 1 %}
                         <span class="w-8 h-8 bg-amber-100 text-amber-700 rounded-full flex items-center justify-center font-bold text-sm">🏆</span>
                         {% elif loop.index == 2 %}
-                        <span class="w-8 h-8 bg-gray-200 text-gray-700 rounded-full flex items-center justify-center font-bold text-sm">🥈</span>
+                        <span class="w-8 h-8 bg-slate-200 text-slate-700 rounded-full flex items-center justify-center font-bold text-sm">🥈</span>
                         {% elif loop.index == 3 %}
                         <span class="w-8 h-8 bg-orange-100 text-orange-800 rounded-full flex items-center justify-center font-bold text-sm">🥉</span>
                         {% else %}
-                        <span class="w-8 h-8 bg-slate-50 text-gray-400 rounded-full flex items-center justify-center font-bold text-sm">#{{ loop.index }}</span>
+                        <span class="w-8 h-8 bg-slate-50 text-slate-400 rounded-full flex items-center justify-center font-bold text-sm">#{{ loop.index }}</span>
                         {% endif %}
                     </td>
 
@@ -83,7 +83,7 @@
                     <td class="px-6 py-4 w-48">
                         <div class="flex items-center gap-3">
                             <div class="flex-1">
-                                <div class="w-full bg-gray-100 rounded-full h-2.5">
+                                <div class="w-full bg-slate-100 rounded-full h-2.5">
                                     <div class="h-2.5 rounded-full score-bar-animated
                                         {% if result.score >= 60 %}bg-green-500
                                         {% elif result.score >= 38 %}bg-amber-500
@@ -97,16 +97,16 @@
                                 {% else %}text-red-600{% endif %}
                             ">{{ result.score }}%</span>
                         </div>
-                        <div class="text-[10px] text-gray-400 mt-1">S:{{ result.sbert_score }} | T:{{ result.tfidf_score }}</div>
+                        <div class="text-[10px] text-slate-400 mt-1">S:{{ result.sbert_score }} | T:{{ result.tfidf_score }}</div>
                     </td>
 
                     <!-- Experience -->
-                    <td class="px-6 py-4 text-sm text-gray-600">
+                    <td class="px-6 py-4 text-sm text-slate-600">
                         {{ result.experience_years }}
                     </td>
 
                     <!-- Matched Skills -->
-                    <td class="px-6 py-4 text-xs text-gray-600">
+                    <td class="px-6 py-4 text-xs text-slate-600">
                         {% if result.matched_skills %}
                             {{ result.matched_skills[:3]|join(', ') }}{% if result.matched_skills|length > 3 %}...{% endif %}
                         {% else %}
@@ -147,11 +147,11 @@
                     <td class="px-6 py-4 text-center">
                         <div class="flex items-center justify-center gap-2" id="feedback-{{ loop.index }}">
                             <button type="button" onclick="sendFeedback('{{ result.candidate_id }}', 'up', this)"
-                                class="p-1.5 rounded-lg hover:bg-green-50 text-gray-400 hover:text-green-600 transition-colors" title="Good match">
+                                class="p-1.5 rounded-lg hover:bg-green-50 text-slate-400 hover:text-green-600 transition-colors" title="Good match">
                                 👍
                             </button>
                             <button type="button" onclick="sendFeedback('{{ result.candidate_id }}', 'down', this)"
-                                class="p-1.5 rounded-lg hover:bg-red-50 text-gray-400 hover:text-red-600 transition-colors" title="Bad match">
+                                class="p-1.5 rounded-lg hover:bg-red-50 text-slate-400 hover:text-red-600 transition-colors" title="Bad match">
                                 👎
                             </button>
                         </div>

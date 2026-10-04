@@ -9,19 +9,19 @@
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <!-- Left Column: Job Description -->
         <div class="space-y-6">
-            <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
-                <h3 class="font-semibold text-gray-800 mb-1 flex items-center gap-2">
+            <div class="bg-white rounded-md p-6  border border-slate-200">
+                <h3 class="font-display font-bold text-slate-900 mb-1 flex items-center gap-2">
                     <svg class="w-5 h-5 text-brand-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
                     </svg>
                     Job Description
                 </h3>
-                <p class="text-xs text-gray-500 mb-4">Paste the job requirements, responsibilities, and qualifications</p>
+                <p class="text-xs text-slate-500 mb-4">Paste the job requirements, responsibilities, and qualifications</p>
                 <textarea 
                     name="job_desc" 
                     id="job-desc"
                     rows="12"
-                    class="w-full px-4 py-3 border border-slate-300 rounded-sm text-sm focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition-all resize-vertical bg-gray-50 placeholder-gray-400"
+                    class="w-full px-4 py-3 border border-slate-300 rounded-sm text-sm focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition-all resize-vertical bg-slate-50 placeholder-slate-400"
                     placeholder="Example: We are looking for a Senior AI Engineer with 5+ years of experience in machine learning, deep learning, NLP, and Python. The ideal candidate should have experience with TensorFlow or PyTorch, transformer architectures, and deploying ML models to production..."
                     required
                 ></textarea>
@@ -31,26 +31,26 @@
         <!-- Right Column: Resume Upload -->
         <div class="space-y-6">
             <!-- File Upload Zone -->
-            <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
-                <h3 class="font-semibold text-gray-800 mb-1 flex items-center gap-2">
+            <div class="bg-white rounded-md p-6  border border-slate-200">
+                <h3 class="font-display font-bold text-slate-900 mb-1 flex items-center gap-2">
                     <svg class="w-5 h-5 text-brand-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/>
                     </svg>
                     Upload Resumes
                 </h3>
-                <p class="text-xs text-gray-500 mb-4">Drag &amp; drop resume files or click to browse. Supports PDF and DOCX.</p>
+                <p class="text-xs text-slate-500 mb-4">Drag &amp; drop resume files or click to browse. Supports PDF and DOCX.</p>
 
                 <!-- Drop Zone -->
                 <div 
                     id="drop-zone"
-                    class="drop-zone border-2 border-dashed border-gray-300 rounded-xl p-8 text-center cursor-pointer hover:border-brand-500 hover:bg-blue-50/50 transition-all duration-200"
+                    class="drop-zone border-2 border-dashed border-slate-300 rounded-md p-8 text-center cursor-pointer hover:border-brand-500 hover:bg-indigo-50/50 transition-all duration-200"
                     onclick="document.getElementById('file-input').click()"
                 >
-                    <svg class="w-12 h-12 mx-auto text-gray-400 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg class="w-12 h-12 mx-auto text-slate-400 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/>
                     </svg>
-                    <p class="text-sm font-medium text-gray-600">Drag &amp; drop PDF or DOCX files here</p>
-                    <p class="text-xs text-gray-400 mt-1">or click to browse</p>
+                    <p class="text-sm font-medium text-slate-600">Drag &amp; drop PDF or DOCX files here</p>
+                    <p class="text-xs text-slate-400 mt-1">or click to browse</p>
                 </div>
                 <input type="file" id="file-input" class="hidden" accept=".pdf,.docx" multiple>
 
@@ -59,23 +59,23 @@
             </div>
 
             <!-- Manual Text Entry (Alternative) -->
-            <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+            <div class="bg-white rounded-md p-6  border border-slate-200">
                 <div class="flex items-center justify-between mb-3">
-                    <h3 class="font-semibold text-gray-800 flex items-center gap-2">
-                        <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <h3 class="font-display font-bold text-slate-900 flex items-center gap-2">
+                        <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
                         </svg>
                         Or Paste Resume Text
                     </h3>
-                    <button type="button" id="add-resume-btn" class="text-xs bg-gray-100 hover:bg-gray-200 text-gray-600 px-3 py-1.5 rounded-sm font-medium transition-colors">
+                    <button type="button" id="add-resume-btn" class="text-xs bg-gray-100 hover:bg-gray-200 text-slate-600 px-3 py-1.5 rounded-sm font-medium transition-colors">
                         + Add Another
                     </button>
                 </div>
                 <div id="resume-text-container" class="space-y-3">
                     <div class="resume-entry">
-                        <label class="block text-xs font-medium text-gray-500 mb-1">Candidate 1</label>
+                        <label class="block text-xs font-medium text-slate-500 mb-1">Candidate 1</label>
                         <textarea 
-                            class="resume-text w-full px-3 py-2.5 border border-gray-200 rounded-sm text-sm focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition-all resize-vertical bg-gray-50 placeholder-gray-400"
+                            class="resume-text w-full px-3 py-2.5 border border-slate-200 rounded-sm text-sm focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition-all resize-vertical bg-slate-50 placeholder-slate-400"
                             rows="4"
                             placeholder="Paste resume text here..."
                         ></textarea>
@@ -89,7 +89,7 @@
     <div class="mt-6 flex justify-center">
         <button 
             type="submit"
-            class="htmx-hide-on-request inline-flex items-center gap-3 bg-brand-600 hover:bg-slate-900 text-white px-8 py-3.5 rounded-xl font-semibold text-base shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-[1.02]"
+            class="htmx-hide-on-request inline-flex items-center gap-3 bg-brand-600 hover:bg-slate-900 text-white px-8 py-3.5 rounded-md font-semibold text-base transition-colors duration-200"
         >
             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/>
@@ -109,8 +109,8 @@
             </svg>
         </div>
     </div>
-    <p class="mt-4 text-sm font-medium text-gray-600">Running AI Screening Engine...</p>
-    <p class="text-xs text-gray-400 mt-1">Analyzing resumes with 4-engine hybrid ensemble</p>
+    <p class="mt-4 text-sm font-medium text-slate-600">Running AI Screening Engine...</p>
+    <p class="text-xs text-slate-400 mt-1">Analyzing resumes with 4-engine hybrid ensemble</p>
 </div>
 
 <!-- Results Container (HTMX target) -->
@@ -172,7 +172,7 @@
         // Show uploading state
         const fileCard = document.createElement('div');
         fileCard.id = fileId;
-        fileCard.className = 'flex items-center gap-3 p-3 bg-gray-50 rounded-sm border border-gray-200 fade-in-up';
+        fileCard.className = 'flex items-center gap-3 p-3 bg-slate-50 rounded-sm border border-slate-200 fade-in-up';
         fileCard.innerHTML = `
             <div class="w-10 h-10 bg-blue-100 rounded-sm flex items-center justify-center flex-shrink-0">
                 <svg class="w-5 h-5 text-blue-600 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -180,8 +180,8 @@
                 </svg>
             </div>
             <div class="flex-1 min-w-0">
-                <p class="text-sm font-medium text-gray-700 truncate">${file.name}</p>
-                <p class="text-xs text-gray-400">Extracting text...</p>
+                <p class="text-sm font-medium text-slate-700 truncate">${file.name}</p>
+                <p class="text-xs text-slate-400">Extracting text...</p>
             </div>
         `;
         fileList.appendChild(fileCard);
@@ -199,10 +199,10 @@
                             </svg>
                         </div>
                         <div class="flex-1 min-w-0">
-                            <p class="text-sm font-medium text-gray-700 truncate">${file.name}</p>
+                            <p class="text-sm font-medium text-slate-700 truncate">${file.name}</p>
                             <p class="text-xs text-green-600">${data.text.length} characters extracted</p>
                         </div>
-                        <button type="button" onclick="removeFile('${fileId}')" class="text-gray-400 hover:text-red-500 p-1 transition-colors">
+                        <button type="button" onclick="removeFile('${fileId}')" class="text-slate-400 hover:text-red-500 p-1 transition-colors">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
                             </svg>
@@ -220,7 +220,7 @@
                             <p class="text-sm font-medium text-red-600 truncate">${file.name}</p>
                             <p class="text-xs text-red-500">${data.error || 'Failed to extract text'}</p>
                         </div>
-                        <button type="button" onclick="removeFile('${fileId}')" class="text-gray-400 hover:text-red-500 p-1">
+                        <button type="button" onclick="removeFile('${fileId}')" class="text-slate-400 hover:text-red-500 p-1">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
                             </svg>
@@ -251,11 +251,11 @@
         div.className = 'resume-entry fade-in-up';
         div.innerHTML = `
             <div class="flex items-center justify-between mb-1">
-                <label class="block text-xs font-medium text-gray-500">Candidate ${resumeCount}</label>
+                <label class="block text-xs font-medium text-slate-500">Candidate ${resumeCount}</label>
                 <button type="button" onclick="this.closest('.resume-entry').remove()" class="text-xs text-red-400 hover:text-red-600">Remove</button>
             </div>
             <textarea 
-                class="resume-text w-full px-3 py-2.5 border border-gray-200 rounded-sm text-sm focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition-all resize-vertical bg-gray-50 placeholder-gray-400"
+                class="resume-text w-full px-3 py-2.5 border border-slate-200 rounded-sm text-sm focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition-all resize-vertical bg-slate-50 placeholder-slate-400"
                 rows="4"
                 placeholder="Paste resume text here..."
             ></textarea>

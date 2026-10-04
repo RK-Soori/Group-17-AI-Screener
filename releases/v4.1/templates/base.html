@@ -4,6 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}AI Screening System{% endblock %}</title>
+    <meta name="description" content="AI-Based Job Candidate Screening and Recommendation System">
+    <meta property="og:title" content="AI Screening System">
+    <meta property="og:description" content="AI-Based Job Candidate Screening and Recommendation System">
+    <link rel="icon" type="image/jpeg" href="{{ url_for('static', filename='logo.jpg') }}">
     <!-- Tailwind CSS CDN -->
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
@@ -56,8 +60,8 @@
         
         /* Drag-and-drop highlight */
         .drop-zone.dragover {
-            border-color: #3b82f6 !important;
-            background-color: #eff6ff !important;
+            border-color: #4f46e5 !important;
+            background-color: #eef2ff !important;
         }
 
         /* Score bar animation */
@@ -143,6 +147,7 @@
         </svg>
     </button>
 
+        <div id="sidebar-overlay" class="fixed inset-0 bg-slate-900/50 z-30 hidden md:hidden transition-opacity"></div>
     <!-- Main Content -->
     <main class="flex-1 min-h-screen md:ml-0">
         <!-- Top Bar -->
@@ -168,9 +173,19 @@
     <script>
         const sidebar = document.querySelector('.sidebar');
         const toggle = document.getElementById('sidebar-toggle');
-        if (toggle) {
-            toggle.addEventListener('click', () => sidebar.classList.toggle('open'));
+        const overlay = document.getElementById('sidebar-overlay');
+        
+        function toggleSidebar() {
+            sidebar.classList.toggle('open');
+            if (sidebar.classList.contains('open')) {
+                overlay.classList.remove('hidden');
+            } else {
+                overlay.classList.add('hidden');
+            }
         }
+        
+        if (toggle) toggle.addEventListener('click', toggleSidebar);
+        if (overlay) overlay.addEventListener('click', toggleSidebar);
     </script>
     {% block extra_scripts %}{% endblock %}
 </body>
