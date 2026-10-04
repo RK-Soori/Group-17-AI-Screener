@@ -129,7 +129,7 @@ def score():
     """Run AI screening and return results as an HTMX partial or JSON."""
     global last_results
 
-    data = request.get_json()
+    data = request.get_json(force=True)
     job_desc = data.get('job_desc', '')
     resumes = data.get('resumes', [])
 
@@ -180,7 +180,7 @@ def score():
 @app.route('/feedback', methods=['POST'])
 def feedback():
     """Capture human-in-the-loop feedback for future model retraining."""
-    data = request.get_json()
+    data = request.get_json(force=True)
     candidate_id = data.get('candidate_id')
     feedback_type = data.get('feedback')
 
