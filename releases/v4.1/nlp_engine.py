@@ -1,3 +1,4 @@
+import datetime
 import re
 import os
 import joblib
@@ -7,14 +8,14 @@ from sklearn.metrics.pairwise import cosine_similarity
 from sentence_transformers import SentenceTransformer
 
 # ==============================================================================
-# AI RESUME MATCHING ENGINE - VERSION 3.0 (REAL-WORLD ROBUSTNESS RELEASE)
+# AI RESUME MATCHING ENGINE - VERSION 5.0 (REAL-WORLD ROBUSTNESS RELEASE)
 # ==============================================================================
 # Features:
 # 1. Expanded Domain Skill Ontology (143+ industry skills across 4 core domains)
 # 2. Robust Multi-Span Date Range & Experience Parser (YYYY-YYYY, YYYY-Present)
 # 3. Sliding-Window Document Chunking with Max-Pooling SBERT Representation
 # 4. Calibrated Cross-Domain Career Transferability Matrix
-# 5. Baseline Floor Rescaling (0.22 floor removal) & Zero-Match Technical Gatekeeper
+# 5. Baseline Floor Rescaling (0.15 floor removal) & Zero-Match Technical Gatekeeper
 # ==============================================================================
 
 # Load pre-fitted Domain TF-IDF model if available
@@ -57,7 +58,7 @@ HR_STOPWORDS = {
     'duties', 'highly', 'motivated', 'driven', 'excellent', 'skills'
 }
 
-# [v3.0] Expanded Semantic Skill Clusters (143+ Skills across 4 Engineering Domains)
+# [v5.0] Expanded Semantic Skill Clusters (143+ Skills across 4 Engineering Domains)
 SKILL_CLUSTERS = {
     'ai_data': {
         'python', 'machine learning', 'data science', 'deep learning', 'pytorch', 
@@ -93,7 +94,7 @@ SKILL_CLUSTERS = {
 # The complete universe of recognized technical competencies
 CORE_SKILLS = set().union(*SKILL_CLUSTERS.values())
 
-# [v3.0] Cross-Domain Career Transferability Matrix
+# [v5.0] Cross-Domain Career Transferability Matrix
 TRANSFER_PAIRS = [
     # Data Analyst / BI -> AI / Machine Learning (+20.0%)
     (re.compile(r'\bdata\s*analyst\b|\bdata\s*analytics\b|\bbi\s*analyst\b', re.I),
@@ -115,7 +116,7 @@ SYNONYMS = {
 
 def extract_years_experience(text):
     """
-    [v3.0] Robust multi-strategy experience extractor:
+    [v5.0] Robust multi-strategy experience extractor:
     1. Explicit mentions: '5+ years', '3 yrs experience'
     2. Date ranges: '2018 - 2022', '2019 - Present'
     """
@@ -128,7 +129,7 @@ def extract_years_experience(text):
     matches = date_pat.findall(text)
     exp_dates = 0
     if matches:
-        CURRENT_YEAR = 2024
+        CURRENT_YEAR = datetime.datetime.now().year
         spans = []
         for s, e in matches:
             s_yr = int(s)
@@ -169,7 +170,7 @@ def jaccard_similarity(doc1, doc2):
 
 def chunk_text(text, max_words=140, overlap=35):
     """
-    [v3.0] Sliding-window text chunker to overcome SBERT 256-token truncation
+    [v5.0] Sliding-window text chunker to overcome SBERT 256-token truncation
     """
     words = text.split()
     if len(words) <= max_words:
@@ -184,7 +185,7 @@ def chunk_text(text, max_words=140, overlap=35):
 
 def calculate_match_scores(job_desc, resumes):
     """
-    [v3.0] Production AI Ensemble Screening Engine
+    [v5.0] Production AI Ensemble Screening Engine
     """
     if not job_desc or not resumes:
         return []
@@ -282,7 +283,13 @@ def calculate_match_scores(job_desc, resumes):
         results.append({
             'candidate_id': f"Candidate {i + 1}",
             'score': percentage,
-            'label': result_label
+            'label': result_label,
+            'sbert_score': round(sbert_scores[i] * 100, 2),
+            'tfidf_score': round(cosine_sim_tfidf[i] * 100, 2),
+            'skill_affinity': round(skill_affinity * 100, 2),
+            'matched_skills': list(exact_matches) if job_skills else [],
+            'missing_skills': list(job_skills - cand_skills) if job_skills else [],
+            'experience_years': cand_exp
         })
     
     # Sort results highest score to lowest

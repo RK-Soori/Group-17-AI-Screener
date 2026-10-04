@@ -1,102 +1,126 @@
-<!-- This is an HTMX partial: returned by POST /score and swapped into #results-container -->
-<div class="fade-in-up">
-    <!-- Results Header -->
-    <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-100 mb-6">
-        <div class="flex items-center justify-between flex-wrap gap-4">
-            <div>
-                <h3 class="text-xl font-bold text-gray-800 flex items-center gap-2">
-                    <svg class="w-6 h-6 text-brand-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
-                    </svg>
-                    Screening Results
-                </h3>
-                <p class="text-sm text-gray-500 mt-1">{{ results|length }} candidate{{ 's' if results|length != 1 else '' }} screened</p>
-            </div>
-            <div class="flex gap-3">
-                <div class="text-center px-4 py-2 bg-green-50 rounded-lg">
-                    <p class="text-lg font-bold text-green-700">{{ stats.highly_suitable }}</p>
-                    <p class="text-xs text-green-600">Highly Suitable</p>
-                </div>
-                <div class="text-center px-4 py-2 bg-amber-50 rounded-lg">
-                    <p class="text-lg font-bold text-amber-700">{{ stats.suitable }}</p>
-                    <p class="text-xs text-amber-600">Suitable</p>
-                </div>
-                <div class="text-center px-4 py-2 bg-red-50 rounded-lg">
-                    <p class="text-lg font-bold text-red-700">{{ stats.low_match }}</p>
-                    <p class="text-xs text-red-600">Low Match</p>
-                </div>
-            </div>
+<!-- Stats Cards -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-5 mb-8">
+    <div class="bg-white rounded-xl p-5 shadow-sm border border-gray-100 flex items-center justify-between">
+        <div>
+            <p class="text-sm text-gray-500 font-medium">Highly Suitable</p>
+            <p class="text-3xl font-bold text-green-600 mt-1">{{ stats.highly_suitable }}</p>
+        </div>
+        <div class="w-12 h-12 bg-green-50 rounded-full flex items-center justify-center">
+            <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+        </div>
+    </div>
+    <div class="bg-white rounded-xl p-5 shadow-sm border border-gray-100 flex items-center justify-between">
+        <div>
+            <p class="text-sm text-gray-500 font-medium">Suitable</p>
+            <p class="text-3xl font-bold text-amber-500 mt-1">{{ stats.suitable }}</p>
+        </div>
+        <div class="w-12 h-12 bg-amber-50 rounded-full flex items-center justify-center">
+            <svg class="w-6 h-6 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+        </div>
+    </div>
+    <div class="bg-white rounded-xl p-5 shadow-sm border border-gray-100 flex items-center justify-between">
+        <div>
+            <p class="text-sm text-gray-500 font-medium">Low Match</p>
+            <p class="text-3xl font-bold text-red-500 mt-1">{{ stats.low_match }}</p>
+        </div>
+        <div class="w-12 h-12 bg-red-50 rounded-full flex items-center justify-center">
+            <svg class="w-6 h-6 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+        </div>
+    </div>
+</div>
+
+<div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden fade-in-up">
+    <!-- Header -->
+    <div class="px-6 py-4 border-b border-gray-100 bg-gray-50 flex items-center justify-between">
+        <h3 class="font-semibold text-gray-800">Candidate Rankings</h3>
+        <div class="flex gap-2">
+            <a href="/export-csv" class="text-sm text-brand-600 bg-brand-50 hover:bg-brand-100 px-3 py-1.5 rounded font-medium transition-colors">
+                Download CSV
+            </a>
+            <span class="text-sm text-gray-500 bg-white px-3 py-1 rounded-full border border-gray-200">
+                Found {{ results|length }} candidates
+            </span>
         </div>
     </div>
 
-    <!-- Results Table -->
-    <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-        <table class="w-full">
+    <!-- Table -->
+    <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse">
             <thead>
-                <tr class="bg-gray-50 border-b border-gray-200">
-                    <th class="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Rank</th>
-                    <th class="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Candidate</th>
-                    <th class="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Match Score</th>
-                    <th class="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Category</th>
-                    <th class="px-6 py-4 text-center text-xs font-semibold text-gray-500 uppercase tracking-wider">Feedback</th>
+                <tr class="bg-white text-xs uppercase text-gray-500 border-b border-gray-100">
+                    <th class="px-6 py-4 font-medium">Rank</th>
+                    <th class="px-6 py-4 font-medium">Candidate ID</th>
+                    <th class="px-6 py-4 font-medium">Match Score</th>
+                    <th class="px-6 py-4 font-medium">Exp (Yrs)</th>
+                    <th class="px-6 py-4 font-medium w-48">Skills Found</th>
+                    <th class="px-6 py-4 font-medium w-48">Missing Skills</th>
+                    <th class="px-6 py-4 font-medium">Category</th>
+                    <th class="px-6 py-4 font-medium text-center">Feedback</th>
                 </tr>
             </thead>
             <tbody class="divide-y divide-gray-100">
                 {% for result in results %}
-                <tr class="hover:bg-gray-50/50 transition-colors">
+                <tr class="hover:bg-gray-50 transition-colors">
                     <!-- Rank -->
                     <td class="px-6 py-4">
                         {% if loop.index == 1 %}
-                        <span class="w-8 h-8 bg-amber-100 text-amber-700 rounded-full flex items-center justify-center font-bold text-sm">
-                            🏆
-                        </span>
+                        <span class="w-8 h-8 bg-amber-100 text-amber-700 rounded-full flex items-center justify-center font-bold text-sm">🏆</span>
                         {% elif loop.index == 2 %}
-                        <span class="w-8 h-8 bg-gray-100 text-gray-600 rounded-full flex items-center justify-center font-bold text-sm">
-                            🥈
-                        </span>
+                        <span class="w-8 h-8 bg-gray-200 text-gray-700 rounded-full flex items-center justify-center font-bold text-sm">🥈</span>
                         {% elif loop.index == 3 %}
-                        <span class="w-8 h-8 bg-orange-100 text-orange-700 rounded-full flex items-center justify-center font-bold text-sm">
-                            🥉
-                        </span>
+                        <span class="w-8 h-8 bg-orange-100 text-orange-800 rounded-full flex items-center justify-center font-bold text-sm">🥉</span>
                         {% else %}
-                        <span class="w-8 h-8 bg-gray-50 text-gray-400 rounded-full flex items-center justify-center font-bold text-sm">
-                            #{{ loop.index }}
-                        </span>
+                        <span class="w-8 h-8 bg-gray-50 text-gray-400 rounded-full flex items-center justify-center font-bold text-sm">#{{ loop.index }}</span>
                         {% endif %}
                     </td>
 
-                    <!-- Candidate Name -->
-                    <td class="px-6 py-4">
-                        <div class="flex items-center gap-3">
-                            <div class="w-9 h-9 rounded-full flex items-center justify-center text-white font-semibold text-sm
-                                {% if result.label == 'Highly Suitable' %}bg-green-500
-                                {% elif result.label == 'Suitable' %}bg-amber-500
-                                {% else %}bg-gray-400{% endif %}
-                            ">
-                                {{ result.candidate_id[0:2] | upper }}
-                            </div>
-                            <span class="font-medium text-gray-800 text-sm">{{ result.candidate_id }}</span>
-                        </div>
+                    <!-- Candidate ID -->
+                    <td class="px-6 py-4 font-medium text-gray-800 text-sm">
+                        {{ result.candidate_id }}
                     </td>
 
                     <!-- Match Score -->
-                    <td class="px-6 py-4 w-64">
+                    <td class="px-6 py-4 w-48">
                         <div class="flex items-center gap-3">
                             <div class="flex-1">
                                 <div class="w-full bg-gray-100 rounded-full h-2.5">
                                     <div class="h-2.5 rounded-full score-bar-animated
-                                        {% if result.score >= 65 %}bg-green-500
-                                        {% elif result.score >= 45 %}bg-amber-500
+                                        {% if result.score >= 60 %}bg-green-500
+                                        {% elif result.score >= 38 %}bg-amber-500
                                         {% else %}bg-red-400{% endif %}
                                     " style="width: {{ result.score }}%"></div>
                                 </div>
                             </div>
-                            <span class="font-bold text-sm w-16 text-right
-                                {% if result.score >= 65 %}text-green-700
-                                {% elif result.score >= 45 %}text-amber-700
+                            <span class="font-bold text-sm w-12 text-right
+                                {% if result.score >= 60 %}text-green-700
+                                {% elif result.score >= 38 %}text-amber-700
                                 {% else %}text-red-600{% endif %}
                             ">{{ result.score }}%</span>
                         </div>
+                        <div class="text-[10px] text-gray-400 mt-1">S:{{ result.sbert_score }} | T:{{ result.tfidf_score }}</div>
+                    </td>
+
+                    <!-- Experience -->
+                    <td class="px-6 py-4 text-sm text-gray-600">
+                        {{ result.experience_years }}
+                    </td>
+
+                    <!-- Matched Skills -->
+                    <td class="px-6 py-4 text-xs text-gray-600">
+                        {% if result.matched_skills %}
+                            {{ result.matched_skills[:3]|join(', ') }}{% if result.matched_skills|length > 3 %}...{% endif %}
+                        {% else %}
+                            -
+                        {% endif %}
+                    </td>
+
+                    <!-- Missing Skills -->
+                    <td class="px-6 py-4 text-xs text-red-500">
+                        {% if result.missing_skills %}
+                            {{ result.missing_skills[:3]|join(', ') }}{% if result.missing_skills|length > 3 %}...{% endif %}
+                        {% else %}
+                            -
+                        {% endif %}
                     </td>
 
                     <!-- Category Badge -->
@@ -120,7 +144,7 @@
                     </td>
 
                     <!-- Feedback -->
-                    <td class="px-6 py-4">
+                    <td class="px-6 py-4 text-center">
                         <div class="flex items-center justify-center gap-2" id="feedback-{{ loop.index }}">
                             <button type="button" onclick="sendFeedback('{{ result.candidate_id }}', 'up', this)"
                                 class="p-1.5 rounded-lg hover:bg-green-50 text-gray-400 hover:text-green-600 transition-colors" title="Good match">
@@ -139,7 +163,7 @@
     </div>
 
     <!-- Score Distribution Chart -->
-    <div class="mt-6 bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+    <div class="mt-6 bg-white rounded-xl p-6 border-t border-gray-100">
         <h4 class="font-semibold text-gray-800 mb-4">Score Distribution</h4>
         <div style="max-height: 300px;">
             <canvas id="score-chart"></canvas>
@@ -149,44 +173,46 @@
 
 <script>
     // Build the score distribution chart
-    const ctx = document.getElementById('score-chart');
-    if (ctx) {
-        const labels = {{ labels | tojson }};
-        const scores = {{ scores | tojson }};
-        const colors = scores.map(s => s >= 65 ? '#22c55e' : (s >= 45 ? '#f59e0b' : '#ef4444'));
-        
-        new Chart(ctx, {
-            type: 'bar',
-            data: {
-                labels: labels,
-                datasets: [{
-                    label: 'Match Score (%)',
-                    data: scores,
-                    backgroundColor: colors,
-                    borderRadius: 6,
-                    borderSkipped: false,
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: true,
-                plugins: {
-                    legend: { display: false },
+    setTimeout(() => {
+        const ctx = document.getElementById('score-chart');
+        if (ctx) {
+            const labels = {{ labels | tojson | safe }};
+            const scores = {{ scores | tojson | safe }};
+            const colors = scores.map(s => s >= 60 ? '#22c55e' : (s >= 38 ? '#f59e0b' : '#ef4444'));
+            
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Match Score (%)',
+                        data: scores,
+                        backgroundColor: colors,
+                        borderRadius: 6,
+                        borderSkipped: false,
+                    }]
                 },
-                scales: {
-                    y: { 
-                        beginAtZero: true, 
-                        max: 100,
-                        ticks: { callback: v => v + '%' },
-                        grid: { color: '#f1f5f9' }
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: {
+                        legend: { display: false },
                     },
-                    x: {
-                        grid: { display: false }
+                    scales: {
+                        y: { 
+                            beginAtZero: true, 
+                            max: 100,
+                            ticks: { callback: v => v + '%' },
+                            grid: { color: '#f1f5f9' }
+                        },
+                        x: {
+                            grid: { display: false }
+                        }
                     }
                 }
-            }
-        });
-    }
+            });
+        }
+    }, 100);
 
     // Feedback handler
     function sendFeedback(candidateId, feedbackType, btn) {
