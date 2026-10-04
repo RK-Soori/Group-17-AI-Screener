@@ -1,26 +1,26 @@
 <!-- Stats Cards -->
 <div class="grid grid-cols-1 md:grid-cols-3 gap-5 mb-8">
-    <div class="bg-white rounded-xl p-5 shadow-sm border border-gray-100 flex items-center justify-between">
+    <div class="bg-white rounded-md p-5  border border-slate-200 flex items-center justify-between">
         <div>
-            <p class="text-sm text-gray-500 font-medium">Highly Suitable</p>
+            <p class="text-sm text-slate-500 font-medium">Highly Suitable</p>
             <p class="text-3xl font-bold text-green-600 mt-1">{{ stats.highly_suitable }}</p>
         </div>
         <div class="w-12 h-12 bg-green-50 rounded-full flex items-center justify-center">
             <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
         </div>
     </div>
-    <div class="bg-white rounded-xl p-5 shadow-sm border border-gray-100 flex items-center justify-between">
+    <div class="bg-white rounded-md p-5  border border-slate-200 flex items-center justify-between">
         <div>
-            <p class="text-sm text-gray-500 font-medium">Suitable</p>
+            <p class="text-sm text-slate-500 font-medium">Suitable</p>
             <p class="text-3xl font-bold text-amber-500 mt-1">{{ stats.suitable }}</p>
         </div>
         <div class="w-12 h-12 bg-amber-50 rounded-full flex items-center justify-center">
             <svg class="w-6 h-6 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
         </div>
     </div>
-    <div class="bg-white rounded-xl p-5 shadow-sm border border-gray-100 flex items-center justify-between">
+    <div class="bg-white rounded-md p-5  border border-slate-200 flex items-center justify-between">
         <div>
-            <p class="text-sm text-gray-500 font-medium">Low Match</p>
+            <p class="text-sm text-slate-500 font-medium">Low Match</p>
             <p class="text-3xl font-bold text-red-500 mt-1">{{ stats.low_match }}</p>
         </div>
         <div class="w-12 h-12 bg-red-50 rounded-full flex items-center justify-center">
@@ -29,15 +29,15 @@
     </div>
 </div>
 
-<div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden fade-in-up">
+<div class="bg-white rounded-md  border border-slate-200 overflow-hidden fade-in-up">
     <!-- Header -->
-    <div class="px-6 py-4 border-b border-gray-100 bg-gray-50 flex items-center justify-between">
-        <h3 class="font-semibold text-gray-800">Candidate Rankings</h3>
+    <div class="px-6 py-4 border-b border-slate-200 bg-slate-50 flex items-center justify-between">
+        <h3 class="font-semibold text-slate-900">Candidate Rankings</h3>
         <div class="flex gap-2">
             <a href="/export-csv" class="text-sm text-brand-600 bg-brand-50 hover:bg-brand-100 px-3 py-1.5 rounded font-medium transition-colors">
                 Download CSV
             </a>
-            <span class="text-sm text-gray-500 bg-white px-3 py-1 rounded-full border border-gray-200">
+            <span class="text-sm text-slate-500 bg-white px-3 py-1 rounded-full border border-gray-200">
                 Found {{ results|length }} candidates
             </span>
         </div>
@@ -47,7 +47,7 @@
     <div class="overflow-x-auto">
         <table class="w-full text-left border-collapse">
             <thead>
-                <tr class="bg-white text-xs uppercase text-gray-500 border-b border-gray-100">
+                <tr class="bg-white text-xs uppercase text-slate-500 border-b border-slate-200">
                     <th class="px-6 py-4 font-medium">Rank</th>
                     <th class="px-6 py-4 font-medium">Candidate ID</th>
                     <th class="px-6 py-4 font-medium">Match Score</th>
@@ -60,7 +60,7 @@
             </thead>
             <tbody class="divide-y divide-gray-100">
                 {% for result in results %}
-                <tr class="hover:bg-gray-50 transition-colors">
+                <tr class="hover:bg-slate-50 transition-colors">
                     <!-- Rank -->
                     <td class="px-6 py-4">
                         {% if loop.index == 1 %}
@@ -70,12 +70,12 @@
                         {% elif loop.index == 3 %}
                         <span class="w-8 h-8 bg-orange-100 text-orange-800 rounded-full flex items-center justify-center font-bold text-sm">🥉</span>
                         {% else %}
-                        <span class="w-8 h-8 bg-gray-50 text-gray-400 rounded-full flex items-center justify-center font-bold text-sm">#{{ loop.index }}</span>
+                        <span class="w-8 h-8 bg-slate-50 text-gray-400 rounded-full flex items-center justify-center font-bold text-sm">#{{ loop.index }}</span>
                         {% endif %}
                     </td>
 
                     <!-- Candidate ID -->
-                    <td class="px-6 py-4 font-medium text-gray-800 text-sm">
+                    <td class="px-6 py-4 font-medium text-slate-900 text-sm">
                         {{ result.candidate_id }}
                     </td>
 
@@ -163,8 +163,8 @@
     </div>
 
     <!-- Score Distribution Chart -->
-    <div class="mt-6 bg-white rounded-xl p-6 border-t border-gray-100">
-        <h4 class="font-semibold text-gray-800 mb-4">Score Distribution</h4>
+    <div class="mt-6 bg-white rounded-md p-6 border-t border-slate-200">
+        <h4 class="font-semibold text-slate-900 mb-4">Score Distribution</h4>
         <div style="max-height: 300px;">
             <canvas id="score-chart"></canvas>
         </div>

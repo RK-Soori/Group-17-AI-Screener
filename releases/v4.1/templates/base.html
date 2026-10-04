@@ -5,24 +5,34 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}AI Screening System{% endblock %}</title>
     <!-- Tailwind CSS CDN -->
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
             theme: {
+                fontFamily: {
+                    sans: ['Inter', 'sans-serif'],
+                    display: ['Space Grotesk', 'sans-serif'],
+                },
                 extend: {
                     colors: {
                         navy: {
-                            800: '#1e293b',
-                            900: '#0f172a',
-                            950: '#020617',
+                            800: '#151b2b',
+                            900: '#0A0F1D',
+                            950: '#050810',
                         },
                         brand: {
-                            50: '#eff6ff',
-                            100: '#dbeafe',
-                            500: '#3b82f6',
-                            600: '#2563eb',
-                            700: '#1d4ed8',
+                            50: '#eef2ff',
+                            100: '#e0e7ff',
+                            500: '#6366f1',
+                            600: '#4f46e5',
+                            700: '#4338ca',
+                            800: '#3730a3',
                         }
+                    },
+                    boxShadow: {
+                        'sm': '0 1px 2px 0 rgba(0, 0, 0, 0.03)',
+                        'DEFAULT': '0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 1px 2px 0 rgba(0, 0, 0, 0.03)',
                     }
                 }
             }
@@ -75,10 +85,10 @@
     </style>
     {% block extra_head %}{% endblock %}
 </head>
-<body class="bg-gray-50 text-gray-900 min-h-screen flex">
+<body class="bg-[#F8FAFC] text-slate-800 min-h-screen flex antialiased">
 
     <!-- Sidebar -->
-    <aside class="sidebar fixed md:static w-64 min-h-screen bg-navy-900 text-white flex flex-col z-40">
+    <aside class="sidebar fixed md:static w-64 min-h-screen bg-navy-900 border-r border-navy-800 text-white flex flex-col z-40">
         <!-- Logo -->
         <div class="p-5 border-b border-slate-700">
             <div class="flex items-center gap-3">
@@ -127,7 +137,7 @@
     </aside>
 
     <!-- Mobile sidebar toggle -->
-    <button id="sidebar-toggle" class="md:hidden fixed top-4 left-4 z-50 bg-navy-900 text-white p-2 rounded-lg shadow-lg">
+    <button id="sidebar-toggle" class="md:hidden fixed top-4 left-4 z-50 bg-navy-900 border-r border-navy-800 text-white p-2 rounded-lg shadow-lg">
         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
         </svg>
@@ -138,7 +148,7 @@
         <!-- Top Bar -->
         <header class="bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between sticky top-0 z-30">
             <div>
-                <h2 class="text-lg font-semibold text-gray-800">{% block page_title %}Dashboard{% endblock %}</h2>
+                <h2 class="text-xl font-display font-bold text-slate-900 tracking-tight">{% block page_title %}Dashboard{% endblock %}</h2>
                 <p class="text-sm text-gray-500">{% block page_subtitle %}{% endblock %}</p>
             </div>
             <div class="flex items-center gap-3">
