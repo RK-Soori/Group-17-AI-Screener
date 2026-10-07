@@ -1,129 +1,492 @@
 {% extends "base.html" %}
 
-{% block title %}Dashboard — AI Screening System{% endblock %}
-{% block page_title %}Dashboard{% endblock %}
-{% block page_subtitle %}AI-Based Job Candidate Screening & Recommendation System{% endblock %}
+{% block title %}AI Screening System — Intelligent Candidate Matching{% endblock %}
 
 {% block content %}
-<!-- Minimalist, technical hero section -->
-<div class="mb-10 flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-slate-200 pb-8">
-    <div class="max-w-3xl">
-        <div class="flex items-center gap-3 mb-4">
-            <span class="inline-flex items-center justify-center px-2 py-1 text-[10px] font-bold tracking-widest uppercase bg-brand-600 text-white rounded-sm">V 5.0</span>
-            
+<!-- ============================================================================== -->
+<!-- SECTION 1: DASHBOARD & OVERVIEW                                                -->
+<!-- ============================================================================== -->
+<section id="dashboard" class="scroll-mt-20">
+    <!-- Centered Hero Section (Full Screen) -->
+    <div class="min-h-[calc(100vh-8rem)] flex flex-col justify-center relative pt-2 sm:pt-4 pb-12 max-w-4xl mx-auto text-center overflow-hidden mb-12 border-b border-slate-200/50">
+        <!-- Subtle Ambient Glow -->
+        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[550px] h-[280px] bg-gradient-to-tr from-blue-500/10 via-indigo-500/10 to-sky-400/10 blur-3xl pointer-events-none -z-10 rounded-full"></div>
+
+        <!-- Eyebrow Badge -->
+        <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-slate-100 border border-slate-200/80 text-slate-800 text-xs font-mono font-bold tracking-wide shadow-sm mb-5 select-none">
+            <span class="w-2 h-2 rounded-full bg-brand-600 animate-pulse"></span>
+            <span>AI MATCHING ENGINE • V5.0 ONLINE</span>
         </div>
-        <h1 class="text-4xl md:text-5xl font-display font-bold text-slate-900 tracking-tight leading-tight">
-            Precision Candidate <br class="hidden md:block"/> Matching Engine.
+
+        <!-- Headline -->
+        <h1 class="text-3xl sm:text-5xl lg:text-6xl font-black font-display text-slate-950 tracking-tight leading-[1.12]">
+            Precision Candidate <br class="hidden sm:inline">
+            <span class="bg-clip-text text-transparent bg-gradient-to-r from-brand-700 via-indigo-600 to-sky-500">
+                Engineered with AI.
+            </span>
         </h1>
-        <p class="text-slate-600 text-lg mt-4 max-w-2xl font-light">
+
+        <p class="mt-4 text-sm sm:text-base text-slate-600 max-w-2xl mx-auto font-normal leading-relaxed">
             Leveraging a hybrid architecture of domain-tuned SBERT, lexical TF-IDF, and bounded skill taxonomy to eliminate bias and isolate top technical talent.
         </p>
-    </div>
-    <div class="shrink-0">
-        <a href="/screen" class="group inline-flex items-center gap-2 bg-slate-900 text-white px-6 py-3.5 rounded-md font-medium text-sm hover:bg-brand-600 transition-colors focus:ring-2 focus:ring-offset-2 focus:ring-brand-500">
-            Initialize Screening
-            <svg class="w-4 h-4 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
-            </svg>
-        </a>
-    </div>
-</div>
 
-<!-- Key Performance Indicators (KPIs) - No shadow, sharp borders -->
-<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-px bg-slate-200 border border-slate-200 rounded-lg overflow-hidden mb-12">
-    <!-- Accuracy -->
-    <div class="bg-white p-6">
-        <span class="text-xs font-mono text-slate-400 uppercase tracking-wider block mb-4">Classification Accuracy</span>
-        <div class="flex items-baseline gap-2">
-            <p class="text-4xl font-display font-bold text-slate-900">100.0<span class="text-2xl text-slate-400">%</span></p>
+        <!-- Feature Pills -->
+        <div class="mt-7 flex flex-wrap items-center justify-center gap-2.5 sm:gap-3 text-xs font-semibold text-slate-700 select-none">
+            <div class="flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-white border border-slate-200/80 shadow-sm">
+                <i class="fa-solid fa-microchip text-brand-600"></i> Hybrid Engine
+            </div>
+            <div class="flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-white border border-slate-200/80 shadow-sm">
+                <i class="fa-solid fa-bolt text-amber-500"></i> Instant Ranking
+            </div>
+            <div class="flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-white border border-slate-200/80 shadow-sm">
+                <i class="fa-solid fa-shield-check text-emerald-600"></i> 100% Bias Free
+            </div>
         </div>
-        <p class="text-xs text-brand-600 font-medium mt-2">12/12 exact category matches</p>
-    </div>
-
-    <!-- MAE -->
-    <div class="bg-white p-6">
-        <span class="text-xs font-mono text-slate-400 uppercase tracking-wider block mb-4">Mean Absolute Error</span>
-        <div class="flex items-baseline gap-2">
-            <p class="text-4xl font-display font-bold text-slate-900">4.68<span class="text-2xl text-slate-400">%</span></p>
-        </div>
-        <p class="text-xs text-slate-500 mt-2">vs Gemini Ground Truth</p>
-    </div>
-
-    <!-- Pearson -->
-    <div class="bg-white p-6">
-        <span class="text-xs font-mono text-slate-400 uppercase tracking-wider block mb-4">Pearson Correlation</span>
-        <div class="flex items-baseline gap-2">
-            <p class="text-4xl font-display font-bold text-slate-900">0.99</p>
-        </div>
-        <p class="text-xs text-slate-500 mt-2">Near-perfect linear agreement</p>
-    </div>
-
-    <!-- FPR -->
-    <div class="bg-white p-6">
-        <span class="text-xs font-mono text-slate-400 uppercase tracking-wider block mb-4">False Positive Rate</span>
-        <div class="flex items-baseline gap-2">
-            <p class="text-4xl font-display font-bold text-slate-900">0.0<span class="text-2xl text-slate-400">%</span></p>
-        </div>
-        <p class="text-xs text-slate-500 mt-2">Zero non-tech false positives</p>
-    </div>
-</div>
-
-<!-- Architecture Details -->
-<div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
-    <!-- Component Breakdown -->
-    <div class="border border-slate-200 bg-white rounded-md p-6 lg:p-8">
-        <h3 class="text-lg font-display font-bold text-slate-900 mb-6">Engine Weights</h3>
         
-        <div class="space-y-6">
-            <div>
-                <div class="flex justify-between text-sm mb-2">
-                    <span class="font-medium text-slate-700">Fine-Tuned Domain SBERT</span>
-                    <span class="font-mono text-brand-600 font-bold">65%</span>
-                </div>
-                <div class="w-full bg-slate-100 h-1.5 rounded-none">
-                    <div class="bg-brand-600 h-1.5 rounded-none" style="width: 65%"></div>
-                </div>
-            </div>
-            <div>
-                <div class="flex justify-between text-sm mb-2">
-                    <span class="font-medium text-slate-700">Domain-Adapted TF-IDF</span>
-                    <span class="font-mono text-slate-900 font-bold">20%</span>
-                </div>
-                <div class="w-full bg-slate-100 h-1.5 rounded-none">
-                    <div class="bg-slate-800 h-1.5 rounded-none" style="width: 20%"></div>
-                </div>
-            </div>
-            <div>
-                <div class="flex justify-between text-sm mb-2">
-                    <span class="font-medium text-slate-700">Bounded Skill Taxonomy</span>
-                    <span class="font-mono text-slate-900 font-bold">15%</span>
-                </div>
-                <div class="w-full bg-slate-100 h-1.5 rounded-none">
-                    <div class="bg-slate-400 h-1.5 rounded-none" style="width: 15%"></div>
-                </div>
-            </div>
+        <div class="mt-8">
+            <a href="#screen" class="tactile-btn-primary inline-flex items-center gap-2 px-6 py-3 text-sm">
+                Initialize Screening <i class="fa-solid fa-arrow-down text-xs"></i>
+            </a>
         </div>
     </div>
 
-    <!-- Tech Stack -->
-    <div class="border border-slate-200 bg-white rounded-md p-6 lg:p-8 flex flex-col justify-between">
-        <div>
-            <h3 class="text-lg font-display font-bold text-slate-900 mb-6">Architecture Stack</h3>
-            <div class="flex flex-wrap gap-2">
-                <span class="px-2.5 py-1 border border-slate-200 text-slate-600 bg-slate-50 text-xs font-mono font-medium rounded-sm">Python 3.12</span>
-                <span class="px-2.5 py-1 border border-slate-200 text-slate-600 bg-slate-50 text-xs font-mono font-medium rounded-sm">Flask 3.0</span>
-                <span class="px-2.5 py-1 border border-slate-200 text-brand-700 bg-brand-50 text-xs font-mono font-medium rounded-sm">Sentence-Transformers</span>
-                <span class="px-2.5 py-1 border border-slate-200 text-brand-700 bg-brand-50 text-xs font-mono font-medium rounded-sm">PyTorch (CUDA)</span>
-                <span class="px-2.5 py-1 border border-slate-200 text-slate-600 bg-slate-50 text-xs font-mono font-medium rounded-sm">Scikit-Learn</span>
-                <span class="px-2.5 py-1 border border-slate-200 text-slate-600 bg-slate-50 text-xs font-mono font-medium rounded-sm">HTMX</span>
-                <span class="px-2.5 py-1 border border-slate-200 text-slate-600 bg-slate-50 text-xs font-mono font-medium rounded-sm">Tailwind CSS</span>
-            </div>
+    <!-- KPI Stats Grid -->
+    <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 mb-12 select-none">
+        <div class="p-4 rounded-2xl bg-white border border-slate-200/80 shadow-sm hover:border-slate-300 transition-all">
+            <div class="text-[11px] font-mono font-bold uppercase text-slate-500 tracking-wider">Classification Accuracy</div>
+            <div class="text-2xl sm:text-3xl font-black font-mono text-slate-950 mt-1">100<span class="text-xl text-slate-400">%</span></div>
+            <div class="text-[10px] text-brand-600 font-bold mt-0.5">12/12 exact category matches</div>
         </div>
-        <div class="mt-8 pt-6 border-t border-slate-100">
-            <p class="text-sm text-slate-500 font-light leading-relaxed">
-                The engine operates purely locally, leveraging pre-compiled semantic vectors and zero-shot taxonomy matching without external API dependencies.
-            </p>
+        <div class="p-4 rounded-2xl bg-white border border-slate-200/80 shadow-sm hover:border-slate-300 transition-all">
+            <div class="text-[11px] font-mono font-bold uppercase text-slate-500 tracking-wider">Mean Absolute Error</div>
+            <div class="text-2xl sm:text-3xl font-black font-mono text-slate-950 mt-1">4.68<span class="text-xl text-slate-400">%</span></div>
+            <div class="text-[10px] text-slate-500 font-medium mt-0.5">vs Gemini Ground Truth</div>
+        </div>
+        <div class="p-4 rounded-2xl bg-white border border-slate-200/80 shadow-sm hover:border-slate-300 transition-all">
+            <div class="text-[11px] font-mono font-bold uppercase text-slate-500 tracking-wider">Pearson Correlation</div>
+            <div class="text-2xl sm:text-3xl font-black font-mono text-slate-950 mt-1">0.99</div>
+            <div class="text-[10px] text-slate-500 font-medium mt-0.5">Near-perfect linear agreement</div>
+        </div>
+        <div class="p-4 rounded-2xl bg-white border border-slate-200/80 shadow-sm hover:border-slate-300 transition-all">
+            <div class="text-[11px] font-mono font-bold uppercase text-slate-500 tracking-wider">False Positive Rate</div>
+            <div class="text-2xl sm:text-3xl font-black font-mono text-emerald-600 mt-1">0.0<span class="text-xl text-emerald-400">%</span></div>
+            <div class="text-[10px] text-emerald-600 font-bold mt-0.5">Zero non-tech false positives</div>
         </div>
     </div>
-</div>
+
+    <!-- Architecture Details -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-16">
+        <!-- Component Breakdown -->
+        <div class="academic-card p-6 lg:p-8">
+            <h3 class="text-lg font-display font-bold text-slate-950 mb-6">Engine Weights</h3>
+            
+            <div class="space-y-6">
+                <div>
+                    <div class="flex justify-between text-sm mb-2">
+                        <span class="font-medium text-slate-700">Fine-Tuned Domain SBERT</span>
+                        <span class="font-mono text-brand-600 font-bold">65%</span>
+                    </div>
+                    <div class="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
+                        <div class="bg-brand-600 h-full rounded-full" style="width: 65%"></div>
+                    </div>
+                </div>
+                <div>
+                    <div class="flex justify-between text-sm mb-2">
+                        <span class="font-medium text-slate-700">Domain-Adapted TF-IDF</span>
+                        <span class="font-mono text-slate-900 font-bold">20%</span>
+                    </div>
+                    <div class="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
+                        <div class="bg-slate-800 h-full rounded-full" style="width: 20%"></div>
+                    </div>
+                </div>
+                <div>
+                    <div class="flex justify-between text-sm mb-2">
+                        <span class="font-medium text-slate-700">Bounded Skill Taxonomy</span>
+                        <span class="font-mono text-slate-900 font-bold">15%</span>
+                    </div>
+                    <div class="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
+                        <div class="bg-slate-400 h-full rounded-full" style="width: 15%"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tech Stack -->
+        <div class="academic-card p-6 lg:p-8 flex flex-col justify-between">
+            <div>
+                <h3 class="text-lg font-display font-bold text-slate-950 mb-6">Architecture Stack</h3>
+                <div class="flex flex-wrap gap-2">
+                    <span class="px-2.5 py-1 border border-slate-200 text-slate-600 bg-slate-50 text-[11px] font-mono font-bold uppercase rounded-md shadow-sm">Python 3.12</span>
+                    <span class="px-2.5 py-1 border border-slate-200 text-slate-600 bg-slate-50 text-[11px] font-mono font-bold uppercase rounded-md shadow-sm">Flask 3.0</span>
+                    <span class="px-2.5 py-1 border border-brand-200 text-brand-700 bg-brand-50 text-[11px] font-mono font-bold uppercase rounded-md shadow-sm">Sentence-Transformers</span>
+                    <span class="px-2.5 py-1 border border-brand-200 text-brand-700 bg-brand-50 text-[11px] font-mono font-bold uppercase rounded-md shadow-sm">PyTorch (CUDA)</span>
+                    <span class="px-2.5 py-1 border border-slate-200 text-slate-600 bg-slate-50 text-[11px] font-mono font-bold uppercase rounded-md shadow-sm">Scikit-Learn</span>
+                    <span class="px-2.5 py-1 border border-slate-200 text-slate-600 bg-slate-50 text-[11px] font-mono font-bold uppercase rounded-md shadow-sm">HTMX</span>
+                </div>
+            </div>
+            <div class="mt-8 pt-6 border-t border-slate-100">
+                <p class="text-sm text-slate-500 font-light leading-relaxed">
+                    The engine operates purely locally, leveraging pre-compiled semantic vectors and zero-shot taxonomy matching without external API dependencies.
+                </p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ============================================================================== -->
+<!-- SECTION 2: SCREEN CANDIDATES (#screen)                                         -->
+<!-- ============================================================================== -->
+<section id="screen" class="pt-16 mb-20 scroll-mt-20 border-t border-slate-200/80">
+    <div class="mb-8">
+        <div class="flex items-center gap-2 mb-1">
+            <span class="px-2 py-0.5 rounded text-[10px] font-mono font-bold text-brand-700 bg-brand-50 border border-brand-200 uppercase">
+                Step 1 &bull; Input
+            </span>
+        </div>
+        <h2 class="text-2xl sm:text-3xl font-display font-bold text-slate-950 tracking-tight">Screen Candidates</h2>
+        <p class="text-sm text-slate-500 mt-1">Upload resumes and match them against required job qualifications.</p>
+    </div>
+
+    <form id="screening-form" hx-post="/score" hx-target="#results-container" hx-swap="innerHTML" hx-indicator="#loading-indicator">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <!-- Left Column: Job Description -->
+            <div class="academic-card p-6 flex flex-col h-full">
+                <div class="flex items-center justify-between mb-1">
+                    <h3 class="font-display font-bold text-slate-900 flex items-center gap-2">
+                        <i class="fa-solid fa-file-signature text-brand-600"></i> Job Description
+                    </h3>
+                    <select id="model-version" class="recessed-slot h-8 px-2 rounded-lg text-[11px] font-bold w-36 cursor-pointer border-slate-200 shadow-sm focus:ring-brand-500/20">
+                        <option value="v5" selected>V5 (Hybrid)</option>
+                        <option value="v3">V3 (Legacy)</option>
+                        <option value="v1">V1 (TF-IDF)</option>
+                    </select>
+                </div>
+                <p class="text-[11px] text-slate-500 mb-3">Paste the job requirements, responsibilities, and qualifications.</p>
+                <textarea 
+                    name="job_desc" 
+                    id="job-desc"
+                    rows="13"
+                    class="recessed-slot w-full p-4 rounded-xl resize-y font-normal"
+                    placeholder="Example: We are looking for a Senior AI Engineer with 5+ years of experience in machine learning, deep learning, NLP, and Python..."
+                    required
+                ></textarea>
+            </div>
+
+            <!-- Right Column: Resume Upload -->
+            <div class="space-y-6">
+                <!-- File Upload Zone -->
+                <div class="academic-card p-6">
+                    <h3 class="font-display font-bold text-slate-900 mb-2 flex items-center gap-2">
+                        <i class="fa-solid fa-cloud-arrow-up text-brand-600"></i> Upload Resumes
+                    </h3>
+                    <p class="text-xs text-slate-500 mb-4">Drag & drop resume files or click to browse. Supports PDF and DOCX.</p>
+
+                    <!-- Drop Zone -->
+                    <div 
+                        id="drop-zone"
+                        class="drop-zone border-2 border-dashed border-slate-300 rounded-xl p-8 text-center cursor-pointer hover:border-brand-600 hover:bg-brand-50 transition-all duration-200"
+                        onclick="document.getElementById('file-input').click()"
+                    >
+                        <i class="fa-solid fa-file-pdf text-3xl text-slate-300 mb-3 block"></i>
+                        <p class="text-sm font-medium text-slate-600">Drag & drop PDF or DOCX files here</p>
+                        <p class="text-xs text-slate-400 mt-1">or click to browse</p>
+                    </div>
+                    <input type="file" id="file-input" class="hidden" accept=".pdf,.docx" multiple>
+
+                    <!-- Uploaded Files List -->
+                    <div id="file-list" class="mt-4 space-y-2"></div>
+                </div>
+
+                <!-- Manual Text Entry -->
+                <div class="academic-card p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="font-display font-bold text-slate-900 flex items-center gap-2">
+                            <i class="fa-solid fa-paste text-slate-400"></i> Or Paste Text
+                        </h3>
+                        <button type="button" id="add-resume-btn" class="tactile-btn px-3 py-1.5 text-[10px] font-mono font-bold uppercase">
+                            + Add Another
+                        </button>
+                    </div>
+                    <div id="resume-text-container" class="space-y-3">
+                        <div class="resume-entry">
+                            <label class="block text-[10px] font-mono font-bold text-slate-500 uppercase tracking-wider mb-1">Candidate 1</label>
+                            <textarea 
+                                class="recessed-slot w-full p-3 rounded-xl font-normal resize-y"
+                                rows="3"
+                                placeholder="Paste resume text here..."
+                            ></textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Action Button -->
+        <div class="mt-8 flex justify-center">
+            <button type="submit" class="htmx-hide-on-request tactile-btn-primary px-8 py-3.5 flex items-center gap-2 text-sm">
+                <i class="fa-solid fa-microchip"></i> Run AI Screening
+            </button>
+        </div>
+    </form>
+
+    <!-- Loading Indicator -->
+    <div id="loading-indicator" class="htmx-indicator flex-col items-center justify-center py-12">
+        <div class="relative">
+            <div class="w-16 h-16 border-4 border-brand-100 border-t-brand-600 rounded-full animate-spin"></div>
+            <div class="absolute inset-0 flex items-center justify-center text-brand-600">
+                <i class="fa-solid fa-microchip"></i>
+            </div>
+        </div>
+        <p class="mt-4 text-sm font-bold text-slate-700">Running AI Screening Engine...</p>
+        <p class="text-xs text-slate-500 mt-1">Analyzing resumes with hybrid neural ensemble</p>
+    </div>
+</section>
+
+<!-- ============================================================================== -->
+<!-- SECTION 3: RESULTS & ANALYTICS (#results)                                      -->
+<!-- ============================================================================== -->
+<section id="results" class="pt-16 mb-24 scroll-mt-20 border-t border-slate-200/80">
+    <div class="mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+            <div class="flex items-center gap-2 mb-1">
+                <span class="px-2 py-0.5 rounded text-[10px] font-mono font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 uppercase">
+                    Step 2 &bull; Output
+                </span>
+            </div>
+            <h2 class="text-2xl sm:text-3xl font-display font-bold text-slate-950 tracking-tight">Candidate Results & Rankings</h2>
+            <p class="text-sm text-slate-500 mt-1">Direct algorithmic ranking based on vector similarity and skill taxonomy alignment.</p>
+        </div>
+    </div>
+
+    <!-- Results Container (Target for HTMX) -->
+    <div id="results-container">
+        {% if results %}
+            {% include "partials/results_table.html" %}
+        {% else %}
+        <div class="flex flex-col items-center justify-center py-20 academic-card">
+            <div class="w-16 h-16 bg-slate-100 rounded-2xl flex items-center justify-center mb-4 border border-slate-200">
+                <i class="fa-solid fa-folder-open text-2xl text-slate-400"></i>
+            </div>
+            <h3 class="text-xl font-display font-bold text-slate-900 mb-1">Ready for Screening</h3>
+            <p class="text-sm text-slate-500 mb-6 text-center max-w-md">
+                No active screening results loaded yet. Provide a job description and resumes in the form above to generate ranked matches.
+            </p>
+            <a href="#screen" class="tactile-btn-primary px-6 py-3 text-sm flex items-center gap-2">
+                <i class="fa-solid fa-arrow-up text-xs"></i> Go to Screening Form
+            </a>
+        </div>
+        {% endif %}
+    </div>
+</section>
+
+<!-- ============================================================================== -->
+<!-- SCRIPT: FILE HANDLING & HTMX JSON DISPATCH                                     -->
+<!-- ============================================================================== -->
+<script>
+    // ==================== File Upload & Drag-and-Drop ====================
+    const dropZone = document.getElementById('drop-zone');
+    const fileInput = document.getElementById('file-input');
+    const fileList = document.getElementById('file-list');
+    let uploadedFiles = {};  // { filename: extracted_text }
+    let fileCounter = 0;
+
+    // Drag events
+    ['dragenter', 'dragover'].forEach(evt => {
+        dropZone?.addEventListener(evt, (e) => {
+            e.preventDefault();
+            dropZone.classList.add('dragover');
+        });
+    });
+
+    ['dragleave', 'drop'].forEach(evt => {
+        dropZone?.addEventListener(evt, (e) => {
+            e.preventDefault();
+            dropZone.classList.remove('dragover');
+        });
+    });
+
+    dropZone?.addEventListener('drop', (e) => {
+        const files = e.dataTransfer.files;
+        handleFiles(files);
+    });
+
+    fileInput?.addEventListener('change', (e) => {
+        handleFiles(e.target.files);
+        fileInput.value = '';  // Reset so same file can be selected again
+    });
+
+    function handleFiles(files) {
+        Array.from(files).forEach(file => {
+            const ext = file.name.split('.').pop().toLowerCase();
+            if (!['pdf', 'docx'].includes(ext)) {
+                alert(`Unsupported file type: .${ext}\nPlease upload PDF or DOCX files.`);
+                return;
+            }
+            uploadFile(file);
+        });
+    }
+
+    function uploadFile(file) {
+        const formData = new FormData();
+        formData.append('file', file);
+
+        const fileId = `file-${fileCounter++}`;
+        
+        // Show uploading state
+        const fileCard = document.createElement('div');
+        fileCard.id = fileId;
+        fileCard.className = 'flex items-center gap-3 p-3 bg-slate-50 rounded-xl border border-slate-200 transition-all';
+        fileCard.innerHTML = `
+            <div class="w-8 h-8 bg-brand-100 rounded-lg flex items-center justify-center flex-shrink-0 text-brand-600">
+                <i class="fa-solid fa-spinner fa-spin text-sm"></i>
+            </div>
+            <div class="flex-1 min-w-0">
+                <p class="text-sm font-bold text-slate-700 truncate">${file.name}</p>
+                <p class="text-xs text-slate-400">Extracting text...</p>
+            </div>
+        `;
+        fileList.appendChild(fileCard);
+
+        fetch('/upload', { method: 'POST', body: formData })
+            .then(res => res.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    uploadedFiles[fileId] = data.text;
+                    const card = document.getElementById(fileId);
+                    card.innerHTML = `
+                        <div class="w-8 h-8 bg-emerald-100 rounded-lg flex items-center justify-center flex-shrink-0 text-emerald-600">
+                            <i class="fa-solid fa-check text-sm"></i>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <p class="text-sm font-bold text-slate-700 truncate">${file.name}</p>
+                            <p class="text-[10px] font-mono text-emerald-600">${data.text.length} chars extracted</p>
+                        </div>
+                        <button type="button" onclick="removeFile('${fileId}')" class="text-slate-400 hover:text-red-500 p-1 transition-colors">
+                            <i class="fa-solid fa-xmark"></i>
+                        </button>
+                    `;
+                } else {
+                    const card = document.getElementById(fileId);
+                    card.innerHTML = `
+                        <div class="w-8 h-8 bg-red-100 rounded-lg flex items-center justify-center flex-shrink-0 text-red-600">
+                            <i class="fa-solid fa-triangle-exclamation text-sm"></i>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <p class="text-sm font-bold text-red-600 truncate">${file.name}</p>
+                            <p class="text-[10px] text-red-500">${data.error || 'Failed to extract text'}</p>
+                        </div>
+                        <button type="button" onclick="removeFile('${fileId}')" class="text-slate-400 hover:text-red-500 p-1">
+                            <i class="fa-solid fa-xmark"></i>
+                        </button>
+                    `;
+                }
+            })
+            .catch(err => {
+                console.error('Upload error:', err);
+                const card = document.getElementById(fileId);
+                if (card) card.remove();
+                alert(`Failed to upload ${file.name}`);
+            });
+    }
+
+    function removeFile(fileId) {
+        delete uploadedFiles[fileId];
+        const card = document.getElementById(fileId);
+        if (card) card.remove();
+    }
+
+    // ==================== Add Resume Text Entry ====================
+    let resumeCount = 1;
+    document.getElementById('add-resume-btn')?.addEventListener('click', () => {
+        resumeCount++;
+        const container = document.getElementById('resume-text-container');
+        const div = document.createElement('div');
+        div.className = 'resume-entry mt-3';
+        div.innerHTML = `
+            <div class="flex items-center justify-between mb-1">
+                <label class="block text-[10px] font-mono font-bold text-slate-500 uppercase tracking-wider">Candidate ${resumeCount}</label>
+                <button type="button" onclick="this.closest('.resume-entry').remove()" class="text-[10px] font-mono font-bold text-red-400 hover:text-red-600 uppercase">Remove</button>
+            </div>
+            <textarea 
+                class="recessed-slot w-full p-3 rounded-xl font-normal resize-y"
+                rows="3"
+                placeholder="Paste resume text here..."
+            ></textarea>
+        `;
+        container.appendChild(div);
+    });
+
+    // ==================== HTMX Form Submission Override ====================
+    document.getElementById('screening-form')?.addEventListener('htmx:configRequest', function(evt) {
+        const resumes = [];
+        Object.values(uploadedFiles).forEach(text => {
+            if (text && text.trim()) resumes.push(text);
+        });
+        document.querySelectorAll('.resume-text, .recessed-slot[rows="3"]').forEach(ta => {
+            if (ta.value.trim()) resumes.push(ta.value.trim());
+        });
+
+        const jobDesc = document.getElementById('job-desc').value;
+        const modelVersion = document.getElementById('model-version') ? document.getElementById('model-version').value : 'v5';
+
+        if (!jobDesc.trim()) {
+            alert('Please enter a job description.');
+            evt.preventDefault();
+            return;
+        }
+
+        if (resumes.length === 0) {
+            alert('Please upload at least one resume or paste resume text.');
+            evt.preventDefault();
+            return;
+        }
+
+        evt.detail.headers['Content-Type'] = 'application/json';
+        evt.detail.parameters = {}; 
+    });
+
+    document.getElementById('screening-form')?.addEventListener('htmx:beforeRequest', function(evt) {
+        const resumes = [];
+        Object.values(uploadedFiles).forEach(text => {
+            if (text && text.trim()) resumes.push(text);
+        });
+        document.querySelectorAll('.resume-text, .recessed-slot[rows="3"]').forEach(ta => {
+            if (ta.value.trim()) resumes.push(ta.value.trim());
+        });
+        const jobDesc = document.getElementById('job-desc').value;
+        const modelVersion = document.getElementById('model-version') ? document.getElementById('model-version').value : 'v5';
+
+        if (!jobDesc.trim() || resumes.length === 0) {
+            evt.preventDefault();
+            return;
+        }
+
+        const xhr = evt.detail.xhr;
+        const originalSend = xhr.send;
+        xhr.send = function() {
+            xhr.setRequestHeader('Content-Type', 'application/json');
+            originalSend.call(xhr, JSON.stringify({
+                job_desc: jobDesc,
+                resumes: resumes,
+                model_version: modelVersion
+            }));
+        };
+    });
+
+    // Automatically smooth-scroll down to Results when HTMX finishes scoring
+    document.body.addEventListener('htmx:afterSwap', function(evt) {
+        if (evt.detail.target.id === 'results-container') {
+            const resultsSection = document.getElementById('results');
+            if (resultsSection) {
+                setTimeout(() => {
+                    resultsSection.scrollIntoView({ behavior: 'smooth' });
+                    history.pushState(null, null, '#results');
+                    if (typeof updateActiveNav === 'function') {
+                        updateActiveNav('results');
+                    }
+                }, 100);
+            }
+        }
+    });
+</script>
 {% endblock %}

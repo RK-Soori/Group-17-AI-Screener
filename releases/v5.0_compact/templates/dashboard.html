@@ -1,0 +1,804 @@
+{% extends "base.html" %}
+
+{% block title %}AI Candidate Screening Cockpit v5.0{% endblock %}
+
+{% block content %}
+<!-- ============================================================================== -->
+<!-- SECTION 1: HERO VIEWPORT (Asymmetric 50/50 Split Screen, min-h-[100dvh])       -->
+<!-- ============================================================================== -->
+<section id="hero" class="min-h-[calc(100dvh-4rem)] flex flex-col justify-center border-b border-slate-800/80 py-16">
+    <div class="max-w-3xl space-y-6">
+        <!-- 1. Eyebrow Label -->
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-mono font-semibold">
+            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+            <span>AI Screening Engine v5.0</span>
+        </div>
+
+        <!-- 2. Headline (Max 2 lines) -->
+        <h1 class="text-4xl sm:text-5xl lg:text-6xl font-black font-display text-white tracking-tight leading-tight">
+            Automated Candidate Screening <br class="hidden sm:inline">
+            <span class="text-emerald-400">
+                & Technical Ranking
+            </span>
+        </h1>
+
+        <!-- 3. Subtext (Max 20 words, max 4 lines - Exactly 13 words) -->
+        <p class="text-base text-slate-300 max-w-[65ch] leading-relaxed">
+            Hybrid SBERT and TF-IDF matching engine calibrated for unbiased engineering talent acquisition.
+        </p>
+
+        <!-- 4. CTAs (1 primary + max 1 secondary) -->
+        <div class="flex flex-wrap items-center gap-3 pt-2">
+            <a href="#screen" class="btn-primary-compact">
+                <i class="fa-solid fa-play text-xs"></i> Run Screening
+            </a>
+            <a href="#architecture" class="btn-secondary-compact">
+                <i class="fa-solid fa-diagram-project text-xs"></i> View Telemetry
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- ============================================================================== -->
+<!-- SECTION 2: SCREENING COCKPIT (No eyebrow - clean section title)                -->
+<!-- ============================================================================== -->
+<section id="screen" class="py-16 scroll-mt-20 border-b border-slate-800/80">
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+        <div>
+            <h2 class="text-2xl font-black font-display text-white tracking-tight">Candidate Screening Cockpit</h2>
+            <p class="text-sm text-slate-400 mt-1">Configure job requisitions and ingest resumes for automated matching</p>
+        </div>
+
+        <!-- 1-Click Preset Requisition Loader -->
+        <div class="flex flex-wrap items-center gap-2">
+            <span class="text-xs font-mono text-slate-500 uppercase">Load Preset:</span>
+            <button type="button" onclick="loadPreset('ai_engineer')" class="btn-secondary-compact text-xs py-1 px-2.5">
+                AI Engineer
+            </button>
+            <button type="button" onclick="loadPreset('frontend_react')" class="btn-secondary-compact text-xs py-1 px-2.5">
+                React Lead
+            </button>
+            <button type="button" onclick="loadPreset('devops_cloud')" class="btn-secondary-compact text-xs py-1 px-2.5">
+                Cloud DevOps
+            </button>
+        </div>
+    </div>
+
+    <form id="screening-form" onsubmit="executeScreening(event)">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            
+            <!-- Left Column: Job Requisition -->
+            <div class="cockpit-card p-6 flex flex-col justify-between">
+                <div>
+                    <div class="flex items-center justify-between mb-3">
+                        <label for="job-desc" class="font-mono text-xs font-bold text-white uppercase flex items-center gap-2">
+                            <i class="fa-solid fa-file-contract text-emerald-400"></i> Job Description
+                        </label>
+                        <select id="model-version" class="cockpit-input px-2.5 py-1 text-xs font-mono font-bold w-36">
+                            <option value="v5" selected>V5 (Ensemble)</option>
+                            <option value="v3">V3 (Early Hybrid)</option>
+                            <option value="v1">V1 (TF-IDF Baseline)</option>
+                        </select>
+                    </div>
+                    <p class="text-xs text-slate-400 mb-3 leading-relaxed">
+                        Specify technical qualifications, required frameworks, and tenure requirements.
+                    </p>
+                    <textarea 
+                        id="job-desc" 
+                        rows="12" 
+                        class="cockpit-input w-full p-4 font-mono text-xs resize-y"
+                        placeholder="Paste job requisition here... (or select a preset above)"
+                        required
+                    ></textarea>
+                </div>
+
+                <div class="mt-4 pt-3 border-t border-slate-800 text-[11px] font-mono text-slate-500 flex justify-between">
+                    <span>Min 20 characters</span>
+                    <span id="job-char-count">0 chars</span>
+                </div>
+            </div>
+
+            <!-- Right Column: Multi-Resume Ingestion -->
+            <div class="space-y-6">
+                <!-- Drop Zone for PDF / DOCX -->
+                <div class="cockpit-card p-6">
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="font-mono text-xs font-bold text-white uppercase flex items-center gap-2">
+                            <i class="fa-solid fa-cloud-arrow-up text-emerald-400"></i> Ingest Files
+                        </span>
+                        <span class="text-[11px] font-mono text-slate-500">PDF / DOCX</span>
+                    </div>
+
+                    <div 
+                        id="drop-zone" 
+                        class="compact-drop-zone p-6 text-center cursor-pointer"
+                        onclick="document.getElementById('file-input').click()"
+                    >
+                        <i class="fa-solid fa-file-arrow-up text-2xl text-slate-500 mb-2 block"></i>
+                        <p class="text-xs font-medium text-slate-300">Drop resume files here or click to browse</p>
+                        <p class="text-[10px] text-slate-500 mt-1">Automatic text parsing via PyPDF2 and python-docx</p>
+                    </div>
+                    <input type="file" id="file-input" class="hidden" accept=".pdf,.docx" multiple onchange="handleFileUpload(event)">
+
+                    <!-- File queue list -->
+                    <div id="file-queue" class="mt-3 space-y-1.5 text-xs font-mono"></div>
+                </div>
+
+                <!-- Direct Text Paste Candidates -->
+                <div class="cockpit-card p-6">
+                    <div class="flex items-center justify-between mb-3">
+                        <span class="font-mono text-xs font-bold text-white uppercase flex items-center gap-2">
+                            <i class="fa-solid fa-code text-slate-400"></i> Candidate Resumes
+                        </span>
+                        <div class="flex items-center gap-2">
+                            <button type="button" onclick="loadBenchmarkDossier()" class="btn-secondary-compact text-[10px] py-1 px-2">
+                                <i class="fa-solid fa-vial text-emerald-400"></i> Load Benchmark (4)
+                            </button>
+                            <button type="button" onclick="addCandidateField()" class="btn-secondary-compact text-[10px] py-1 px-2">
+                                + Add Candidate
+                            </button>
+                        </div>
+                    </div>
+
+                    <div id="resume-container" class="space-y-3 max-h-56 overflow-y-auto pr-1">
+                        <div class="candidate-input-entry">
+                            <div class="flex justify-between items-center text-[10px] font-mono text-slate-400 mb-1">
+                                <span>Candidate 1</span>
+                            </div>
+                            <textarea 
+                                class="resume-textarea cockpit-input w-full p-2.5 font-mono text-xs resize-y" 
+                                rows="3" 
+                                placeholder="Paste resume plain text here..."
+                            ></textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Submit CTA -->
+        <div class="mt-8 flex flex-col items-center justify-center">
+            <button type="submit" id="submit-btn" class="btn-primary-compact text-base py-3 px-8">
+                <i class="fa-solid fa-microchip"></i> Run Screening
+            </button>
+            <p class="text-xs text-slate-500 font-mono mt-2">Processes through 3-tier ensemble with technical gatekeeper</p>
+        </div>
+    </form>
+
+    <!-- Loading State Indicator -->
+    <div id="loading-indicator" class="hidden flex-col items-center justify-center py-12">
+        <div class="w-12 h-12 border-4 border-slate-800 border-t-emerald-400 rounded-full animate-spin"></div>
+        <p class="font-mono text-xs text-emerald-400 mt-4 tracking-wider uppercase">Evaluating candidate embeddings...</p>
+        <span class="text-[11px] text-slate-500 mt-1">Chunking multi-page text & executing MNRL semantic match</span>
+    </div>
+</section>
+
+<!-- ============================================================================== -->
+<!-- SECTION 3: ARCHITECTURE & BENCHMARKS (No eyebrow - clean section title)       -->
+<!-- ============================================================================== -->
+<section id="architecture" class="py-16 scroll-mt-20 border-b border-slate-800/80">
+    <div class="mb-8">
+        <h2 class="text-2xl font-black font-display text-white tracking-tight">Ensemble Architecture & Benchmarks</h2>
+        <p class="text-sm text-slate-400 mt-1">Empirical evaluation metrics and mathematical calibration breakdown</p>
+    </div>
+
+    <!-- 4-Column KPI Stats Grid -->
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10">
+        <div class="cockpit-card p-5">
+            <div class="text-[11px] font-mono uppercase text-slate-500">Classification Accuracy</div>
+            <div class="text-3xl font-black font-mono text-white mt-1">100<span class="text-emerald-400 text-xl">%</span></div>
+            <div class="text-[10px] text-emerald-400 font-mono mt-1">12/12 test profiles categorized</div>
+        </div>
+
+        <div class="cockpit-card p-5">
+            <div class="text-[11px] font-mono uppercase text-slate-500">Mean Absolute Error</div>
+            <div class="text-3xl font-black font-mono text-white mt-1">4.68<span class="text-slate-500 text-xl">%</span></div>
+            <div class="text-[10px] text-slate-400 font-mono mt-1">vs Gemini Ground Truth</div>
+        </div>
+
+        <div class="cockpit-card p-5">
+            <div class="text-[11px] font-mono uppercase text-slate-500">Pearson Correlation</div>
+            <div class="text-3xl font-black font-mono text-emerald-400 mt-1">0.99</div>
+            <div class="text-[10px] text-slate-400 font-mono mt-1">Near-perfect linear agreement</div>
+        </div>
+
+        <div class="cockpit-card p-5">
+            <div class="text-[11px] font-mono uppercase text-slate-500">Non-Tech False Positives</div>
+            <div class="text-3xl font-black font-mono text-emerald-400 mt-1">0.0<span class="text-xl text-slate-500">%</span></div>
+            <div class="text-[10px] text-emerald-400 font-mono mt-1">Zero-Match Technical Gatekeeper</div>
+        </div>
+    </div>
+
+    <!-- Live Ensemble Model Telemetry Card -->
+    <div class="cockpit-card p-6 mb-8 border border-slate-800 bg-[#0f172a]/90 relative overflow-hidden">
+        <div class="flex items-center justify-between pb-4 mb-4 border-b border-slate-800">
+            <div class="flex items-center gap-2">
+                <div class="w-3 h-3 rounded-full bg-emerald-500"></div>
+                <span class="font-mono text-xs font-bold text-white uppercase tracking-wider">Live Model Telemetry</span>
+            </div>
+            <span class="badge-compact badge-accent text-[11px]">Ensemble Active</span>
+        </div>
+
+        <!-- Weight Bars -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 font-mono text-xs">
+            <div>
+                <div class="flex justify-between mb-1.5">
+                    <span class="text-slate-300">Fine-Tuned Domain SBERT</span>
+                    <span class="text-emerald-400 font-bold">65% Weight</span>
+                </div>
+                <div class="w-full h-2 rounded-xl bg-slate-900 border border-slate-800 overflow-hidden">
+                    <div class="h-full rounded-xl bg-emerald-400" style="width: 65%"></div>
+                </div>
+                <div class="text-[10px] text-slate-500 mt-1">MNRL Loss • 140-Word Overlapping Sliding Chunks</div>
+            </div>
+
+            <div>
+                <div class="flex justify-between mb-1.5">
+                    <span class="text-slate-300">Domain-Adapted TF-IDF</span>
+                    <span class="text-emerald-400 font-bold">20% Weight</span>
+                </div>
+                <div class="w-full h-2 rounded-xl bg-slate-900 border border-slate-800 overflow-hidden">
+                    <div class="h-full rounded-xl bg-emerald-400/80" style="width: 20%"></div>
+                </div>
+                <div class="text-[10px] text-slate-500 mt-1">48,393 Unigram & Bigram Features • Sublinear Scaling</div>
+            </div>
+
+            <div>
+                <div class="flex justify-between mb-1.5">
+                    <span class="text-slate-300">Skill Cluster Taxonomy</span>
+                    <span class="text-emerald-400 font-bold">15% Weight</span>
+                </div>
+                <div class="w-full h-2 rounded-xl bg-slate-900 border border-slate-800 overflow-hidden">
+                    <div class="h-full rounded-xl bg-emerald-400/60" style="width: 15%"></div>
+                </div>
+                <div class="text-[10px] text-slate-500 mt-1">143+ Technical Skills Across 4 Core Disciplines</div>
+            </div>
+        </div>
+
+        <!-- Floor Rescaling Notice -->
+        <div class="mt-5 p-3 rounded-xl bg-slate-900/80 border border-slate-800 font-mono text-[11px] text-slate-400 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+            <div class="flex items-center gap-2">
+                <i class="fa-solid fa-calculator text-emerald-400"></i>
+                <span>Baseline Rescaling Floor: <strong class="text-white">0.15 Normalization</strong></span>
+            </div>
+            <span class="text-[10px] text-slate-500">Mathematical floor neutralizes background English lexical overlap</span>
+        </div>
+    </div>
+
+    <!-- 2-Column Pipeline Details -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <!-- 5-Layer Operational Pipeline -->
+        <div class="cockpit-card p-6">
+            <h3 class="font-mono text-xs font-bold text-white uppercase mb-4 flex items-center gap-2">
+                <i class="fa-solid fa-layer-group text-emerald-400"></i> Operational Pipeline
+            </h3>
+            
+            <div class="space-y-3 font-mono text-xs">
+                <div class="p-3 rounded-xl bg-slate-900/60 border border-slate-800">
+                    <span class="text-emerald-400 font-bold">1. Ingestion Layer</span>
+                    <p class="text-slate-400 text-[11px] mt-0.5">Extracts structured requisition and resumes from PDF, DOCX, or text.</p>
+                </div>
+
+                <div class="p-3 rounded-xl bg-slate-900/60 border border-slate-800">
+                    <span class="text-emerald-400 font-bold">2. Preprocessing & Chunking</span>
+                    <p class="text-slate-400 text-[11px] mt-0.5">Tenure date extraction with 140-word sliding windows to solve truncation.</p>
+                </div>
+
+                <div class="p-3 rounded-xl bg-slate-900/60 border border-slate-800">
+                    <span class="text-emerald-400 font-bold">3. Hybrid AI Ensemble</span>
+                    <p class="text-slate-400 text-[11px] mt-0.5">Domain SBERT (65%) + Lexical TF-IDF (20%) + Taxonomy Affinity (15%).</p>
+                </div>
+
+                <div class="p-3 rounded-xl bg-slate-900/60 border border-slate-800">
+                    <span class="text-emerald-400 font-bold">4. Mathematical Calibration</span>
+                    <p class="text-slate-400 text-[11px] mt-0.5">0.15 floor rescaling, square-root experience bonus, career transfer matrix.</p>
+                </div>
+
+                <div class="p-3 rounded-xl bg-slate-900/60 border border-slate-800">
+                    <span class="text-emerald-400 font-bold">5. Decision Tiers</span>
+                    <p class="text-slate-400 text-[11px] mt-0.5">Automated partitioning into Highly Suitable (&gt;=60%), Suitable, or Low Match.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Skill Taxonomy Breakdown -->
+        <div class="cockpit-card p-6">
+            <h3 class="font-mono text-xs font-bold text-white uppercase mb-4 flex items-center gap-2">
+                <i class="fa-solid fa-network-wired text-emerald-400"></i> Domain Competency Clusters (143+)
+            </h3>
+
+            <div class="space-y-3 text-xs">
+                <div>
+                    <div class="flex justify-between font-mono text-[11px] text-slate-300 mb-1">
+                        <span>AI & Data Science (44 Competencies)</span>
+                        <span class="text-emerald-400">Python, PyTorch, LLMs, NLP</span>
+                    </div>
+                    <div class="p-2.5 rounded-xl bg-slate-900/60 border border-slate-800 font-mono text-[10px] text-slate-400">
+                        transformers, scikit-learn, pandas, sql, fastapi, opencv, huggingface, spark, airflow
+                    </div>
+                </div>
+
+                <div>
+                    <div class="flex justify-between font-mono text-[11px] text-slate-300 mb-1">
+                        <span>Frontend Engineering (31 Competencies)</span>
+                        <span class="text-emerald-400">React, TypeScript, Next.js</span>
+                    </div>
+                    <div class="p-2.5 rounded-xl bg-slate-900/60 border border-slate-800 font-mono text-[10px] text-slate-400">
+                        javascript, tailwind, redux, vue, angular, responsive, dom, jest, cypress
+                    </div>
+                </div>
+
+                <div>
+                    <div class="flex justify-between font-mono text-[11px] text-slate-300 mb-1">
+                        <span>Backend & Systems (40 Competencies)</span>
+                        <span class="text-emerald-400">Java, Go, Spring, Microservices</span>
+                    </div>
+                    <div class="p-2.5 rounded-xl bg-slate-900/60 border border-slate-800 font-mono text-[10px] text-slate-400">
+                        c++, c#, .net, node.js, rust, kafka, rabbitmq, redis, postgresql, docker
+                    </div>
+                </div>
+
+                <div>
+                    <div class="flex justify-between font-mono text-[11px] text-slate-300 mb-1">
+                        <span>DevOps & Cloud (28 Competencies)</span>
+                        <span class="text-emerald-400">AWS, Kubernetes, Terraform</span>
+                    </div>
+                    <div class="p-2.5 rounded-xl bg-slate-900/60 border border-slate-800 font-mono text-[10px] text-slate-400">
+                        azure, gcp, docker, k8s, ci/cd, jenkins, gitlab, prometheus, grafana, linux
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ============================================================================== -->
+<!-- SECTION 4: RANKED CANDIDATE TELEMETRY (No eyebrow - clean section title)      -->
+<!-- ============================================================================== -->
+<section id="results" class="py-16 scroll-mt-20">
+    <div class="flex items-center justify-between mb-8">
+        <div>
+            <h2 class="text-2xl font-black font-display text-white tracking-tight">Ranked Candidate Telemetry</h2>
+            <p class="text-sm text-slate-400 mt-1">Live ranking output, explainability diagnostics, and export controls</p>
+        </div>
+    </div>
+
+    <!-- Live HTMX Results Target -->
+    <div id="results-container">
+        {% include "partials/results_table.html" %}
+    </div>
+</section>
+
+<!-- Interactive Scripts for Client-Side Operations -->
+<script>
+    // Embedded benchmark presets for instant zero-latency loading
+    const FALLBACK_PRESETS = {
+        "ai_engineer": {
+            "title": "Senior Python & AI Engineer",
+            "job_desc": "Looking for a Senior Python & AI Engineer with at least 3 years of experience. Must be proficient in Python, PyTorch or TensorFlow, Natural Language Processing, building REST APIs with FastAPI or Flask, and containerization using Docker and Linux.",
+            "candidates": [
+                {
+                    "name": "Alex Chen",
+                    "role": "Senior AI & Machine Learning Engineer",
+                    "text": "Senior AI & Machine Learning Engineer with 4 years of experience (2020 - Present). Proficient in Python, PyTorch, TensorFlow, Natural Language Processing (NLP), transformers, Hugging Face, Flask, FastAPI, Docker, and Linux. Built and deployed scalable LLM applications."
+                },
+                {
+                    "name": "Sarah Miller",
+                    "role": "Data Analyst",
+                    "text": "Data Analyst with 3 years experience (2021 - Present). Skilled in Python, SQL, Pandas, Tableau, and basic Machine Learning algorithms like Scikit-Learn regression and classification. Experienced in data visualization and reporting."
+                },
+                {
+                    "name": "David Clark",
+                    "role": "Junior Web Developer",
+                    "text": "Junior Web Developer with 1 year experience (2023 - 2024) in HTML, CSS, JavaScript, and basic Python scripting. Passionate about AI and eager to learn machine learning frameworks."
+                },
+                {
+                    "name": "Marcus Vance",
+                    "role": "Executive Chef",
+                    "text": "Head Chef with 8 years of culinary and kitchen management experience (2016 - 2024). Expert in menu development, food safety protocols, inventory control, and staff supervision."
+                }
+            ]
+        },
+        "frontend_react": {
+            "title": "Frontend React Developer",
+            "job_desc": "Hiring a Frontend Developer with 2+ years experience building responsive web apps using React, JavaScript, TypeScript, HTML5, CSS3, and Redux. Experience with Git and REST APIs required.",
+            "candidates": [
+                {
+                    "name": "Elena Rostova",
+                    "role": "React Developer",
+                    "text": "Frontend Developer with 3 years of experience (2021 - Present) specializing in React, TypeScript, JavaScript, Redux, HTML5, modern CSS, Git, and integrating RESTful APIs."
+                },
+                {
+                    "name": "Kevin Zhang",
+                    "role": "Full-Stack Node/Vue Engineer",
+                    "text": "Full-stack engineer with 2 years experience in Vue, JavaScript, Node.js, Express, HTML, CSS, SQL, and Git. Some exposure to React fundamentals."
+                },
+                {
+                    "name": "Arthur Pendelton",
+                    "role": "Civil Construction Engineer",
+                    "text": "Civil Engineer with 6 years experience managing urban infrastructure builds, concrete testing, safety audits, and CAD site layouts."
+                }
+            ]
+        },
+        "devops_cloud": {
+            "title": "DevOps & Cloud Infrastructure Engineer",
+            "job_desc": "Seeking a Cloud DevOps Engineer with 3+ years experience managing AWS or Azure cloud infrastructure, Docker, Kubernetes, Terraform, CI/CD pipelines with GitHub Actions or Jenkins, and Linux systems administration.",
+            "candidates": [
+                {
+                    "name": "Siddharth Rao",
+                    "role": "Senior Cloud DevOps Engineer",
+                    "text": "Cloud Infrastructure Engineer with 4 years experience (2020 - Present) in AWS, Docker, Kubernetes, Terraform, Jenkins, GitHub Actions, Linux administration, and microservices telemetry."
+                },
+                {
+                    "name": "Liam O'Connor",
+                    "role": "Linux System Administrator",
+                    "text": "System Administrator with 3 years experience managing Ubuntu and CentOS Linux servers, Bash scripting, Docker containers, and networking."
+                },
+                {
+                    "name": "Hannah Abbott",
+                    "role": "Digital Marketing Specialist",
+                    "text": "Marketing lead with 5 years experience managing SEO campaigns, Google Ads, content strategy, and social media brand positioning."
+                }
+            ]
+        }
+    };
+
+    let uploadedResumes = [];
+    let presetsData = FALLBACK_PRESETS;
+    let scoreChartInstance = null;
+
+    // Fetch dynamic presets if updated
+    fetch('/api/presets')
+        .then(res => res.json())
+        .then(data => { if (data && Object.keys(data).length) presetsData = data; })
+        .catch(err => console.log('Using embedded preset fallback:', err));
+
+    // Load Preset Requisition & Candidates
+    function loadPreset(presetKey) {
+        const p = presetsData[presetKey] || FALLBACK_PRESETS[presetKey];
+        if (!p) return;
+
+        document.getElementById('job-desc').value = p.job_desc;
+        updateCharCount();
+        
+        // Auto populate resumes from preset with metadata preserved
+        const container = document.getElementById('resume-container');
+        container.innerHTML = '';
+        p.candidates.forEach((cand, idx) => {
+            const entry = document.createElement('div');
+            entry.className = 'candidate-input-entry';
+            entry.setAttribute('data-name', `${cand.name} (${cand.role})`);
+            entry.innerHTML = `
+                <div class="flex justify-between items-center text-[10px] font-mono text-slate-400 mb-1">
+                    <span class="font-bold text-slate-300">${cand.name} <span class="text-slate-500 font-normal">(${cand.role})</span></span>
+                    <button type="button" onclick="this.parentElement.parentElement.remove()" class="text-rose-400 hover:text-rose-300">Remove</button>
+                </div>
+                <textarea class="resume-textarea cockpit-input w-full p-2.5 font-mono text-xs resize-y" rows="3">${cand.text}</textarea>
+            `;
+            container.appendChild(entry);
+        });
+    }
+
+    // Add candidate field manually
+    function addCandidateField() {
+        const container = document.getElementById('resume-container');
+        const count = container.children.length + 1;
+        const entry = document.createElement('div');
+        entry.className = 'candidate-input-entry';
+        entry.setAttribute('data-name', `Candidate ${count}`);
+        entry.innerHTML = `
+            <div class="flex justify-between items-center text-[10px] font-mono text-slate-400 mb-1">
+                <span>Candidate ${count}</span>
+                <button type="button" onclick="this.parentElement.parentElement.remove()" class="text-rose-400 hover:text-rose-300">Remove</button>
+            </div>
+            <textarea class="resume-textarea cockpit-input w-full p-2.5 font-mono text-xs resize-y" rows="3" placeholder="Paste resume text..."></textarea>
+        `;
+        container.appendChild(entry);
+    }
+
+    // Load standard 4 benchmark candidates
+    function loadBenchmarkDossier() {
+        loadPreset('ai_engineer');
+    }
+
+    // Character counter
+    const jobTextarea = document.getElementById('job-desc');
+    const charCounter = document.getElementById('job-char-count');
+    function updateCharCount() {
+        charCounter.textContent = `${jobTextarea.value.length} chars`;
+    }
+    jobTextarea.addEventListener('input', updateCharCount);
+
+    // File Drag and Drop Handling
+    const dropZone = document.getElementById('drop-zone');
+    dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('dragover'); });
+    dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
+    dropZone.addEventListener('drop', (e) => {
+        e.preventDefault();
+        dropZone.classList.remove('dragover');
+        if (e.dataTransfer.files.length) {
+            handleFiles(e.dataTransfer.files);
+        }
+    });
+
+    function handleFileUpload(e) {
+        if (e.target.files.length) {
+            handleFiles(e.target.files);
+        }
+    }
+
+    function removeUploadedFile(fileId) {
+        uploadedResumes = uploadedResumes.filter(item => item.id !== fileId);
+        const el = document.getElementById(`queue-item-${fileId}`);
+        if (el) el.remove();
+    }
+
+    function handleFiles(files) {
+        const queue = document.getElementById('file-queue');
+        Array.from(files).forEach(file => {
+            const fileId = 'f_' + Math.random().toString(36).substring(2, 9);
+            const formData = new FormData();
+            formData.append('file', file);
+            
+            const item = document.createElement('div');
+            item.id = `queue-item-${fileId}`;
+            item.className = 'p-2 rounded-xl bg-slate-900 border border-slate-800 flex items-center justify-between';
+            item.innerHTML = `<span><i class="fa-solid fa-spinner fa-spin text-emerald-400 mr-2"></i> ${file.name}</span><span class="text-slate-500">Parsing...</span>`;
+            queue.appendChild(item);
+
+            fetch('/upload', {
+                method: 'POST',
+                body: formData
+            })
+            .then(res => res.json().then(data => ({ ok: res.ok, data })))
+            .then(({ ok, data }) => {
+                if (ok && data.status === 'success') {
+                    item.innerHTML = `
+                        <span class="text-emerald-400 flex items-center gap-1.5">
+                            <i class="fa-solid fa-check"></i> ${data.filename}
+                        </span>
+                        <div class="flex items-center gap-2">
+                            <span class="text-[10px] text-slate-500">${data.text.length} chars</span>
+                            <button type="button" onclick="removeUploadedFile('${fileId}')" class="text-rose-400 hover:text-rose-300 ml-1" title="Remove file">
+                                <i class="fa-solid fa-xmark"></i>
+                            </button>
+                        </div>
+                    `;
+                    uploadedResumes.push({
+                        id: fileId,
+                        name: data.filename,
+                        text: data.text
+                    });
+                } else {
+                    item.innerHTML = `
+                        <span class="text-rose-400 flex items-center gap-1.5">
+                            <i class="fa-solid fa-xmark"></i> ${file.name}
+                        </span>
+                        <span class="text-rose-500 text-[10px]">${data.error || 'Failed'}</span>
+                    `;
+                }
+            })
+            .catch(err => {
+                item.innerHTML = `<span class="text-rose-400">${file.name} network failure</span>`;
+            });
+        });
+    }
+
+    // Chart.js Score Telemetry Renderer
+    function renderScoreChart() {
+        const chartCanvas = document.getElementById('scoreChart');
+        if (!chartCanvas || typeof Chart === 'undefined') return;
+
+        const dataEl = document.getElementById('results-chart-data');
+        if (!dataEl) return;
+
+        let chartData = { labels: [], scores: [] };
+        try {
+            chartData = JSON.parse(dataEl.textContent);
+        } catch (e) {
+            return;
+        }
+
+        if (!chartData.labels || chartData.labels.length === 0) return;
+
+        if (scoreChartInstance) {
+            scoreChartInstance.destroy();
+            scoreChartInstance = null;
+        }
+
+        const ctx = chartCanvas.getContext('2d');
+        const barColors = chartData.scores.map(s => {
+            if (s >= 60) return '#10b981';
+            if (s >= 38) return '#f59e0b';
+            return '#f43f5e';
+        });
+
+        scoreChartInstance = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: chartData.labels,
+                datasets: [{
+                    label: 'Match Score (%)',
+                    data: chartData.scores,
+                    backgroundColor: barColors,
+                    borderRadius: 6,
+                    borderSkipped: false,
+                    barThickness: 18,
+                    maxBarThickness: 24
+                }]
+            },
+            options: {
+                indexAxis: 'y',
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        backgroundColor: '#0f172a',
+                        borderColor: '#1e293b',
+                        borderWidth: 1,
+                        titleColor: '#f8fafc',
+                        bodyColor: '#10b981',
+                        padding: 8,
+                        displayColors: false,
+                        callbacks: {
+                            label: function(ctx) { return ` Match Score: ${ctx.parsed.x}%`; }
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        min: 0,
+                        max: 100,
+                        grid: { color: 'rgba(51, 65, 85, 0.25)' },
+                        ticks: {
+                            color: '#94a3b8',
+                            font: { family: 'Geist Mono', size: 10 },
+                            callback: function(val) { return val + '%'; }
+                        }
+                    },
+                    y: {
+                        grid: { display: false },
+                        ticks: {
+                            color: '#f8fafc',
+                            font: { family: 'Geist Mono', size: 11, weight: '600' }
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    // Global Candidate Filtering State & Handlers
+    window.activeTierFilter = 'all';
+
+    window.applyCandidateFilters = function() {
+        const searchInput = document.getElementById('candidate-search');
+        const query = searchInput ? searchInput.value.toLowerCase().trim() : '';
+        const rows = document.querySelectorAll('.candidate-row');
+        rows.forEach(row => {
+            const rowLabel = row.getAttribute('data-label');
+            const rowText = (row.getAttribute('data-text') || '').toLowerCase();
+            const matchesTier = (window.activeTierFilter === 'all' || rowLabel === window.activeTierFilter);
+            const matchesSearch = (!query || rowText.includes(query));
+            row.style.display = (matchesTier && matchesSearch) ? '' : 'none';
+        });
+    };
+
+    window.filterCandidateList = function() {
+        window.applyCandidateFilters();
+    };
+
+    window.filterByTier = function(tier, btnEl) {
+        window.activeTierFilter = tier;
+        document.querySelectorAll('.tier-pill').forEach(btn => {
+            btn.className = 'tier-pill px-3 py-1 rounded-xl font-mono text-xs font-semibold bg-slate-900 text-slate-400 border border-slate-800 hover:border-slate-700 transition-colors';
+        });
+        if (btnEl) {
+            btnEl.className = 'tier-pill active px-3 py-1 rounded-xl font-mono text-xs font-semibold bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 transition-colors';
+        }
+        window.applyCandidateFilters();
+    };
+
+    window.sendFeedback = function(candidateId, type, btnEl) {
+        fetch('/feedback', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ candidate_id: candidateId, feedback: type })
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (btnEl) {
+                btnEl.classList.remove('text-slate-400', 'bg-slate-900');
+                if (type === 'approve') {
+                    btnEl.classList.add('bg-emerald-500/20', 'text-emerald-300', 'border-emerald-500');
+                } else {
+                    btnEl.classList.add('bg-rose-500/20', 'text-rose-300', 'border-rose-500');
+                }
+            }
+        })
+        .catch(err => console.error('Feedback failed:', err));
+    };
+
+    // Screening Execution Handler
+    function executeScreening(e) {
+        e.preventDefault();
+        const jobDesc = document.getElementById('job-desc').value.trim();
+        const modelVersion = document.getElementById('model-version').value;
+
+        // Collect all candidates (both typed and uploaded) with names preserved
+        const candidatePayload = [];
+        document.querySelectorAll('.candidate-input-entry').forEach((entry, idx) => {
+            const textarea = entry.querySelector('.resume-textarea');
+            if (textarea && textarea.value.trim().length > 0) {
+                const name = entry.getAttribute('data-name') || `Candidate ${idx + 1}`;
+                candidatePayload.push({
+                    name: name,
+                    text: textarea.value.trim()
+                });
+            }
+        });
+
+        uploadedResumes.forEach(u => {
+            if (u.text && u.text.trim().length > 0) {
+                candidatePayload.push({
+                    name: u.name,
+                    text: u.text.trim()
+                });
+            }
+        });
+
+        if (candidatePayload.length === 0) {
+            alert('Please provide at least one candidate resume (via text or upload).');
+            return;
+        }
+
+        const submitBtn = document.getElementById('submit-btn');
+        const indicator = document.getElementById('loading-indicator');
+        const container = document.getElementById('results-container');
+
+        submitBtn.disabled = true;
+        indicator.classList.remove('hidden');
+        indicator.classList.add('flex');
+
+        fetch('/score', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'HX-Request': 'true'
+            },
+            body: JSON.stringify({
+                job_desc: jobDesc,
+                resumes: candidatePayload,
+                model_version: modelVersion
+            })
+        })
+        .then(res => {
+            if (!res.ok) {
+                return res.text().then(t => { throw new Error(t); });
+            }
+            return res.text();
+        })
+        .then(html => {
+            container.innerHTML = html;
+            // Render Score Distribution Chart
+            renderScoreChart();
+            // Scroll to results section smoothly
+            document.getElementById('results').scrollIntoView({ behavior: 'smooth' });
+        })
+        .catch(err => {
+            container.innerHTML = `<div class="cockpit-card p-6 border-rose-500/30 text-rose-300 text-xs font-mono">${err.message}</div>`;
+        })
+        .finally(() => {
+            submitBtn.disabled = false;
+            indicator.classList.add('hidden');
+            indicator.classList.remove('flex');
+        });
+    }
+
+    // Initialize chart if results are preloaded on initial page view
+    document.addEventListener('DOMContentLoaded', () => {
+        renderScoreChart();
+    });
+</script>
+{% endblock %}

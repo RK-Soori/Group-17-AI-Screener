@@ -1,0 +1,54 @@
+{
+  "results": [
+    {
+      "candidate_id": "Alex Chen (Senior AI Engineer)",
+      "score": 94.89,
+      "label": "Highly Suitable",
+      "sbert_score": 94.95,
+      "tfidf_score": 94.7,
+      "skill_affinity": 100.0,
+      "matched_skills": [
+        "nlp",
+        "python",
+        "pytorch",
+        "transformers"
+      ],
+      "missing_skills": [],
+      "experience_years": 4,
+      "transfer_boost": 0.0
+    },
+    {
+      "candidate_id": "Marcus Vance (Chef)",
+      "score": 0.0,
+      "label": "Low Match",
+      "sbert_score": 12.26,
+      "tfidf_score": 2.38,
+      "skill_affinity": 0.0,
+      "matched_skills": [],
+      "missing_skills": [
+        "nlp",
+        "python",
+        "pytorch",
+        "transformers"
+      ],
+      "experience_years": 0,
+      "transfer_boost": 0.0
+    }
+  ],
+  "stats": {
+    "highly_suitable": 1,
+    "suitable": 0,
+    "low_match": 1,
+    "avg_score": 47.4,
+    "top_score": 94.89
+  },
+  "labels": [
+    "Alex Chen (Senior AI Engineer)",
+    "Marcus Vance (Chef)"
+  ],
+  "scores": [
+    94.89,
+    0.0
+  ],
+  "model_version": "v5"
+}

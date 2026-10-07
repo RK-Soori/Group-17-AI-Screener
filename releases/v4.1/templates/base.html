@@ -1,192 +1,316 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="light scroll-smooth">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}AI Screening System{% endblock %}</title>
+    
     <meta name="description" content="AI-Based Job Candidate Screening and Recommendation System">
-    <meta property="og:title" content="AI Screening System">
-    <meta property="og:description" content="AI-Based Job Candidate Screening and Recommendation System">
     <link rel="icon" type="image/jpeg" href="{{ url_for('static', filename='logo.jpg') }}">
+
+    <!-- Google Fonts: Sovereign Academic Pairing -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700;800&family=Outfit:wght@400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <!-- FontAwesome 6 Pro Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
     <!-- Tailwind CSS CDN -->
-        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
             theme: {
-                fontFamily: {
-                    sans: ['Inter', 'sans-serif'],
-                    display: ['Space Grotesk', 'sans-serif'],
-                },
                 extend: {
-                    colors: {
-                        navy: {
-                            800: '#151b2b',
-                            900: '#0A0F1D',
-                            950: '#050810',
-                        },
-                        brand: {
-                            50: '#eef2ff',
-                            100: '#e0e7ff',
-                            500: '#6366f1',
-                            600: '#4f46e5',
-                            700: '#4338ca',
-                            800: '#3730a3',
-                        }
+                    fontFamily: {
+                        sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+                        display: ['"Outfit"', 'sans-serif'],
+                        mono: ['"JetBrains Mono"', 'monospace'],
                     },
-                    boxShadow: {
-                        'sm': '0 1px 2px 0 rgba(0, 0, 0, 0.03)',
-                        'DEFAULT': '0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 1px 2px 0 rgba(0, 0, 0, 0.03)',
+                    colors: {
+                        brand: {
+                            50: '#F6F6F6',
+                            100: '#EEEEEE',
+                            500: '#333333',
+                            600: '#000000',
+                            700: '#333333',
+                        },
+                        slate: {
+                            50: '#FFFFFF',
+                            100: '#F6F6F6',
+                            200: '#E2E2E2',
+                            300: '#EEEEEE',
+                            400: '#5E5E5E',
+                            500: '#5E5E5E',
+                            600: '#5E5E5E',
+                            700: '#000000',
+                            800: '#000000',
+                            900: '#000000',
+                            950: '#000000'
+                        },
+                        blue: {
+                            500: '#F6F6F6',
+                            700: '#000000'
+                        },
+                        indigo: {
+                            500: '#F6F6F6',
+                            600: '#333333'
+                        },
+                        sky: {
+                            400: '#F6F6F6',
+                            500: '#5E5E5E'
+                        },
+                        emerald: {
+                            50: '#EAF9F0',
+                            100: '#C2EAD5',
+                            400: '#06C167',
+                            500: '#06C167',
+                            600: '#06C167',
+                            700: '#0E8345',
+                        },
+                        red: {
+                            50: '#FCE8E5',
+                            100: '#F8C6C0',
+                            400: '#E11900',
+                            500: '#E11900',
+                            600: '#E11900',
+                            700: '#C01500',
+                        },
+                        amber: {
+                            400: '#FFC043',
+                            500: '#FFC043',
+                            600: '#FFC043',
+                        }
                     }
                 }
             }
         }
     </script>
-    <!-- HTMX -->
+    
+    <!-- HTMX & Chart.js -->
     <script src="https://unpkg.com/htmx.org@2.0.4"></script>
-    <!-- Chart.js for score visualizations -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+    
     <style>
-        /* Custom scrollbar */
-        ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: #475569; border-radius: 3px; }
-        ::-webkit-scrollbar-thumb:hover { background: #64748b; }
-        
-        /* Smooth transitions for HTMX swaps */
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #ffffff;
+            color: #000000;
+            background-image: 
+                radial-gradient(circle at 50% 0%, rgba(0, 0, 0, 0.02) 0%, transparent 50%),
+                radial-gradient(circle at 90% 20%, rgba(0, 0, 0, 0.01) 0%, transparent 40%),
+                radial-gradient(circle at 10% 70%, rgba(0, 0, 0, 0.01) 0%, transparent 40%);
+            background-attachment: fixed;
+        }
+
+        .academic-card {
+            background: #ffffff;
+            border: 1px solid #E2E2E2;
+            box-shadow: 0 1px 3px 0 rgba(15, 23, 42, 0.04), 0 4px 12px -2px rgba(15, 23, 42, 0.03);
+            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+            border-radius: 1.25rem;
+        }
+        .academic-card:hover {
+            border-color: #CCCCCC;
+            box-shadow: 0 10px 25px -4px rgba(15, 23, 42, 0.07);
+            transform: translateY(-1.5px);
+        }
+
+        .recessed-slot {
+            background: #F6F6F6;
+            border: 1px solid #E2E2E2;
+            color: #000000;
+            transition: all 0.2s ease;
+        }
+        .recessed-slot:focus-within, .recessed-slot:focus {
+            background: #ffffff;
+            border-color: #000000;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+            outline: none;
+        }
+
+        .tactile-btn-primary {
+            background: #000000;
+            color: #ffffff;
+            box-shadow: 0 4px 14px rgba(29, 78, 216, 0.3);
+            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+            border-radius: 0.75rem;
+            font-weight: 700;
+        }
+        .tactile-btn-primary:hover {
+            background: #333333;
+            box-shadow: 0 6px 20px rgba(29, 78, 216, 0.4);
+            transform: translateY(-1px);
+        }
+        .tactile-btn-primary:active {
+            transform: scale(0.97);
+        }
+
+        .tactile-btn {
+            background: #ffffff;
+            border: 1px solid #E2E2E2;
+            color: #000000;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+            border-radius: 0.5rem;
+        }
+        .tactile-btn:hover {
+            background: #F6F6F6;
+            border-color: #CCCCCC;
+            color: #000000;
+            transform: translateY(-1px);
+        }
+
+        /* Ambient grid overlay */
+        .ambient-grid {
+            position: fixed; inset: 0; pointer-events: none; opacity: 0.02; z-index: -1;
+            background-image: radial-gradient(#000 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+
+        /* HTMX Loading States */
         .htmx-indicator { display: none; }
         .htmx-request .htmx-indicator { display: flex; }
         .htmx-request .htmx-hide-on-request { display: none; }
         
-        /* Drag-and-drop highlight */
         .drop-zone.dragover {
-            border-color: #4f46e5 !important;
-            background-color: #eef2ff !important;
-        }
-
-        /* Score bar animation */
-        @keyframes fillBar {
-            from { width: 0%; }
-        }
-        .score-bar-animated {
-            animation: fillBar 0.8s ease-out forwards;
-        }
-
-        /* Fade-in animation */
-        @keyframes fadeInUp {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        .fade-in-up {
-            animation: fadeInUp 0.4s ease-out forwards;
-        }
-
-        /* Sidebar mobile toggle */
-        @media (max-width: 768px) {
-            .sidebar { transform: translateX(-100%); transition: transform 0.3s ease; }
-            .sidebar.open { transform: translateX(0); }
+            border-color: #2563eb !important;
+            background-color: #eff6ff !important;
         }
     </style>
-    {% block extra_head %}{% endblock %}
 </head>
-<body class="bg-[#F8FAFC] text-slate-800 min-h-screen flex antialiased">
+<body class="antialiased min-h-screen flex flex-col">
 
-    <!-- Sidebar -->
-    <aside class="sidebar fixed md:static w-64 min-h-screen bg-navy-900 border-r border-navy-800 text-white flex flex-col z-40">
-        <!-- Logo -->
-        <div class="p-5 border-b border-slate-700">
-            <div class="flex items-center gap-3">
-                <div class="w-10 h-10 bg-white rounded-lg flex items-center justify-center overflow-hidden shrink-0 shadow-sm border border-slate-600">
-                    <img src="{{ url_for('static', filename='logo.jpg') }}" alt="Logo" class="w-full h-full object-cover">
+    <div class="ambient-grid"></div>
+
+    <!-- Top Floating Navbar -->
+    <header class="bg-white/90 backdrop-blur-2xl sticky top-0 z-40 border-b border-slate-200/80 shadow-[0_1px_3px_rgba(0,0,0,0.03)] transition-all">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
+            
+            <!-- Logo -->
+            <a href="/" class="flex items-center gap-3 group">
+                <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-brand-700 via-indigo-600 to-sky-500 p-[1px] shadow-sm">
+                    <div class="w-full h-full rounded-[11px] bg-white flex items-center justify-center overflow-hidden">
+                        <img src="/static/logo.jpg" alt="Logo" class="w-full h-full object-cover">
+                    </div>
                 </div>
-                <div>
-                    <h1 class="font-bold text-sm leading-tight">AI Candidate</h1>
-                    <p class="text-xs text-slate-400">Screening System</p>
+                <div class="flex flex-col hidden sm:flex">
+                    <span class="text-base font-black tracking-tight font-display text-slate-950 leading-none">
+                        AI<span class="text-brand-600">.Screener</span>
+                    </span>
+                    <span class="text-[10px] font-mono uppercase tracking-wider text-slate-500 font-semibold mt-1">
+                        Recruitment Engine
+                    </span>
                 </div>
+            </a>
+
+            <!-- Center Segmented Nav -->
+            <nav id="navbar-links" class="hidden md:flex items-center p-1 rounded-xl bg-slate-100/90 border border-slate-200/80 shadow-sm">
+                <a href="#dashboard" class="nav-item px-3.5 py-1.5 rounded-lg text-xs font-bold text-brand-700 bg-white shadow-sm border border-slate-200/80 flex items-center gap-2 transition-all duration-200" data-section="dashboard">
+                    <i class="fa-solid fa-chart-pie"></i> Dashboard
+                </a>
+                <a href="#screen" class="nav-item px-3.5 py-1.5 rounded-lg text-xs font-bold text-slate-600 hover:text-slate-950 hover:bg-white/60 flex items-center gap-2 transition-all duration-200" data-section="screen">
+                    <i class="fa-solid fa-user-check"></i> Screen Candidates
+                </a>
+                <a href="#results" class="nav-item px-3.5 py-1.5 rounded-lg text-xs font-bold text-slate-600 hover:text-slate-950 hover:bg-white/60 flex items-center gap-2 transition-all duration-200" data-section="results">
+                    <i class="fa-solid fa-list-check"></i> Results
+                </a>
+            </nav>
+
+            <!-- Right Actions & Mobile Hamburger -->
+            <div class="flex items-center gap-2">
+                <div class="hidden sm:flex items-center gap-2">
+                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[10px] font-mono font-bold text-emerald-700 bg-emerald-50 border border-emerald-200">
+                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span> ONLINE
+                    </span>
+                </div>
+                <button id="mobile-menu-btn" class="md:hidden w-9 h-9 flex items-center justify-center rounded-lg bg-slate-100 border border-slate-200 text-slate-700">
+                    <i class="fa-solid fa-bars"></i>
+                </button>
             </div>
         </div>
-
-        <!-- Navigation -->
-        <nav class="flex-1 p-4 space-y-1">
-            <a href="/" class="nav-link flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-all duration-200
-                {% if active_page == 'dashboard' %}bg-brand-600 text-white{% else %}text-slate-300 hover:bg-slate-800 hover:text-white{% endif %}">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
-                </svg>
-                Dashboard
-            </a>
-            <a href="/screen" class="nav-link flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-all duration-200
-                {% if active_page == 'screen' %}bg-brand-600 text-white{% else %}text-slate-300 hover:bg-slate-800 hover:text-white{% endif %}">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/>
-                </svg>
-                Screen Candidates
-            </a>
-            <a href="/results" class="nav-link flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-all duration-200
-                {% if active_page == 'results' %}bg-brand-600 text-white{% else %}text-slate-300 hover:bg-slate-800 hover:text-white{% endif %}">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
-                </svg>
-                Results
-            </a>
-        </nav>
-
-        <!-- Footer -->
-        <div class="p-4 border-t border-slate-700">
-            <div class="text-xs text-slate-500 text-center">
-                <p>Version 5.0</p>
-                <p class="mt-1">Group 17 &bull; KDU</p>
-            </div>
+        
+        <!-- Mobile Nav Menu (Hidden by default) -->
+        <div id="mobile-nav" class="hidden md:hidden border-t border-slate-200 bg-white p-4 space-y-2 shadow-lg">
+            <a href="#dashboard" class="mobile-nav-item block px-4 py-2 rounded-lg bg-slate-50 text-sm font-bold text-slate-700"><i class="fa-solid fa-chart-pie w-5"></i> Dashboard</a>
+            <a href="#screen" class="mobile-nav-item block px-4 py-2 rounded-lg bg-slate-50 text-sm font-bold text-slate-700"><i class="fa-solid fa-user-check w-5"></i> Screen Candidates</a>
+            <a href="#results" class="mobile-nav-item block px-4 py-2 rounded-lg bg-slate-50 text-sm font-bold text-slate-700"><i class="fa-solid fa-list-check w-5"></i> Results</a>
         </div>
-    </aside>
+    </header>
 
-    <!-- Mobile sidebar toggle -->
-    <button id="sidebar-toggle" class="md:hidden fixed top-4 left-4 z-50 bg-navy-900 border-r border-navy-800 text-white p-2 rounded-lg shadow-lg">
-        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
-        </svg>
-    </button>
-
-        <div id="sidebar-overlay" class="fixed inset-0 bg-slate-900/50 z-30 hidden md:hidden transition-opacity"></div>
     <!-- Main Content -->
-    <main class="flex-1 min-h-screen md:ml-0">
-        <!-- Top Bar -->
-        <header class="bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between sticky top-0 z-30">
-            <div>
-                <h2 class="text-xl font-display font-bold text-slate-900 tracking-tight">{% block page_title %}Dashboard{% endblock %}</h2>
-                <p class="text-sm text-gray-500">{% block page_subtitle %}{% endblock %}</p>
-            </div>
-            <div class="flex items-center gap-3">
-                <span class="text-xs bg-green-100 text-green-700 px-3 py-1 rounded-full font-medium">
-                    ● Engine Online
-                </span>
-            </div>
-        </header>
-
-        <!-- Page Content -->
-        <div class="p-6">
-            {% block content %}{% endblock %}
-        </div>
+    <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {% block content %}{% endblock %}
     </main>
 
-    <!-- Mobile sidebar script -->
     <script>
-        const sidebar = document.querySelector('.sidebar');
-        const toggle = document.getElementById('sidebar-toggle');
-        const overlay = document.getElementById('sidebar-overlay');
-        
-        function toggleSidebar() {
-            sidebar.classList.toggle('open');
-            if (sidebar.classList.contains('open')) {
-                overlay.classList.remove('hidden');
-            } else {
-                overlay.classList.add('hidden');
-            }
+        // Toggle mobile menu
+        document.getElementById('mobile-menu-btn')?.addEventListener('click', function() {
+            const menu = document.getElementById('mobile-nav');
+            menu.classList.toggle('hidden');
+        });
+
+        // Smooth Scroll & Hash Navigation
+        function updateActiveNav(activeId) {
+            document.querySelectorAll('.nav-item').forEach(item => {
+                const section = item.getAttribute('data-section');
+                if (section === activeId) {
+                    item.className = 'nav-item px-3.5 py-1.5 rounded-lg text-xs font-bold text-brand-700 bg-white shadow-sm border border-slate-200/80 flex items-center gap-2 transition-all duration-200';
+                } else {
+                    item.className = 'nav-item px-3.5 py-1.5 rounded-lg text-xs font-bold text-slate-600 hover:text-slate-950 hover:bg-white/60 flex items-center gap-2 transition-all duration-200';
+                }
+            });
         }
-        
-        if (toggle) toggle.addEventListener('click', toggleSidebar);
-        if (overlay) overlay.addEventListener('click', toggleSidebar);
+
+        // Anchor link clicking
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                const targetId = this.getAttribute('href').substring(1);
+                const targetEl = document.getElementById(targetId);
+                if (targetEl) {
+                    e.preventDefault();
+                    targetEl.scrollIntoView({ behavior: 'smooth' });
+                    history.pushState(null, null, '#' + targetId);
+                    updateActiveNav(targetId);
+                    const mobileNav = document.getElementById('mobile-nav');
+                    if (mobileNav && !mobileNav.classList.contains('hidden')) {
+                        mobileNav.classList.add('hidden');
+                    }
+                }
+            });
+        });
+
+        // Scrollspy for active tab
+        const monitoredSections = ['dashboard', 'screen', 'results'];
+        let scrollTimeout;
+        window.addEventListener('scroll', () => {
+            clearTimeout(scrollTimeout);
+            scrollTimeout = setTimeout(() => {
+                let current = 'dashboard';
+                const scrollPos = window.scrollY + 250;
+                monitoredSections.forEach(id => {
+                    const el = document.getElementById(id);
+                    if (el && el.offsetTop <= scrollPos) {
+                        current = id;
+                    }
+                });
+                updateActiveNav(current);
+            }, 30);
+        }, { passive: true });
+
+        // Handle initial URL hash on page load (e.g. /#screen or /#results)
+        window.addEventListener('load', () => {
+            if (window.location.hash) {
+                const hashId = window.location.hash.substring(1);
+                const target = document.getElementById(hashId);
+                if (target) {
+                    setTimeout(() => {
+                        target.scrollIntoView({ behavior: 'smooth' });
+                        updateActiveNav(hashId);
+                    }, 150);
+                }
+            }
+        });
     </script>
-    {% block extra_scripts %}{% endblock %}
 </body>
 </html>

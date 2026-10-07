@@ -183,7 +183,7 @@ def chunk_text(text, max_words=140, overlap=35):
             break
     return chunks
 
-def calculate_match_scores(job_desc, resumes):
+def calculate_match_scores(job_desc, resumes, model_version="v5"):
     """
     [v5.0] Production AI Ensemble Screening Engine
     """
@@ -210,21 +210,23 @@ def calculate_match_scores(job_desc, resumes):
     cosine_sim_tfidf = cosine_similarity(job_tfidf, resume_tfidf).flatten()
     
     # 3. Fine-Tuned SBERT Semantic Processing with Sliding-Window Chunking
-    model = get_sbert()
-    job_embedding = model.encode([job_desc])
-    
-    sbert_scores = []
-    for r in resumes:
-        r_chunks = chunk_text(r)
-        if len(r_chunks) == 1:
-            emb = model.encode([r])
-            sbert_scores.append(float(cosine_similarity(job_embedding, emb)[0][0]))
-        else:
-            chunk_embs = model.encode(r_chunks)
-            chunk_sims = cosine_similarity(job_embedding, chunk_embs)[0]
-            top2 = sorted(chunk_sims, reverse=True)[:2]
-            sim_max_pool = float(0.7 * top2[0] + 0.3 * np.mean(top2))
-            sbert_scores.append(sim_max_pool)
+    sbert_scores = [0.0] * len(resumes)
+    if model_version in ['v3', 'v5']:
+        model = get_sbert()
+        job_embedding = model.encode([job_desc])
+        
+        sbert_scores = []
+        for r in resumes:
+            r_chunks = chunk_text(r)
+            if len(r_chunks) == 1:
+                emb = model.encode([r])
+                sbert_scores.append(float(cosine_similarity(job_embedding, emb)[0][0]))
+            else:
+                chunk_embs = model.encode(r_chunks)
+                chunk_sims = cosine_similarity(job_embedding, chunk_embs)[0]
+                top2 = sorted(chunk_sims, reverse=True)[:2]
+                sim_max_pool = float(0.7 * top2[0] + 0.3 * np.mean(top2))
+                sbert_scores.append(sim_max_pool)
             
     # 4. Job Domain Skills
     job_skills = {s for s in CORE_SKILLS if re.search(r'\b' + re.escape(s) + r'\b', job_desc.lower())}
@@ -246,30 +248,50 @@ def calculate_match_scores(job_desc, resumes):
                 cluster_credits += min(len(job_in_cl), len(cand_in_cl)) * 0.5
             skill_affinity = (len(exact_matches) * 1.0 + cluster_credits) / len(job_skills)
         
-        # 5. Hybrid Blended Score (65% SBERT + 20% TF-IDF + 15% Skill Affinity)
-        raw_blended = (sbert_scores[i] * 0.65) + (cosine_sim_tfidf[i] * 0.20) + (skill_affinity * 0.15)
+        # 5. Hybrid Blended Score based on Version
+        percentage = 0.0
         
-        # Baseline Floor Rescaling (0.15 floor removal)
-        BASELINE_FLOOR = 0.15
-        calibrated_score = max(0.0, (raw_blended - BASELINE_FLOOR) / (1.0 - BASELINE_FLOOR))
-        percentage = calibrated_score * 100.0
-        
-        # 6. Dynamic Experience Bonus
         cand_exp = extract_years_experience(resumes[i])
-        if job_exp_req > 0 and cand_exp >= job_exp_req:
-            relevance_factor = min(1.0, (calibrated_score ** 0.5))
-            percentage += 15.0 * relevance_factor
         
-        # 7. Cross-Domain Career Transferability Index
-        for cand_pat, job_pat, boost_val in TRANSFER_PAIRS:
-            if cand_pat.search(resumes[i]) and job_pat.search(job_desc):
-                percentage += boost_val
-                break
-                
-        # 8. Technical Gatekeeper (Hard zero if no technical skills)
-        if not cand_skills:
-            percentage = 0.0
+        if model_version == 'v1':
+            # V1: Pure TF-IDF, No Calibration, No Gatekeeper
+            percentage = float(cosine_sim_tfidf[i]) * 100.0
             
+        elif model_version == 'v3':
+            # V3: Early Hybrid (45% SBERT, 35% TF-IDF, 20% Taxonomy)
+            raw_blended = (sbert_scores[i] * 0.45) + (cosine_sim_tfidf[i] * 0.35) + (skill_affinity * 0.20)
+            BASELINE_FLOOR = 0.22
+            calibrated_score = max(0.0, (raw_blended - BASELINE_FLOOR) / (1.0 - BASELINE_FLOOR))
+            percentage = calibrated_score * 100.0
+            
+            # Legacy Experience Bonus
+            if job_exp_req > 0 and cand_exp >= job_exp_req:
+                percentage += 10.0
+                
+        else:
+            # V5: Current Production
+            raw_blended = (sbert_scores[i] * 0.65) + (cosine_sim_tfidf[i] * 0.20) + (skill_affinity * 0.15)
+            
+            # Baseline Floor Rescaling (0.15 floor removal)
+            BASELINE_FLOOR = 0.15
+            calibrated_score = max(0.0, (raw_blended - BASELINE_FLOOR) / (1.0 - BASELINE_FLOOR))
+            percentage = calibrated_score * 100.0
+            
+            # 6. Dynamic Experience Bonus
+            if job_exp_req > 0 and cand_exp >= job_exp_req:
+                relevance_factor = min(1.0, (calibrated_score ** 0.5))
+                percentage += 15.0 * relevance_factor
+            
+            # 7. Cross-Domain Career Transferability Index
+            for cand_pat, job_pat, boost_val in TRANSFER_PAIRS:
+                if cand_pat.search(resumes[i]) and job_pat.search(job_desc):
+                    percentage += boost_val
+                    break
+                    
+            # 8. Technical Gatekeeper (Hard zero if no technical skills)
+            if not cand_skills:
+                percentage = 0.0
+        
         percentage = round(min(percentage, 100.0), 2)
         
         # 9. Decision Thresholds
