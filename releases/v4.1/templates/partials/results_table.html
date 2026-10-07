@@ -1,45 +1,22 @@
-<!-- Stats Cards -->
-<div class="grid grid-cols-1 md:grid-cols-3 gap-5 mb-8">
-    <div class="bg-white rounded-md p-5  border border-slate-200 flex items-center justify-between">
-        <div>
-            <p class="text-sm text-slate-500 font-medium">Highly Suitable</p>
-            <p class="text-3xl font-bold text-green-600 mt-1">{{ stats.highly_suitable }}</p>
-        </div>
-        <div class="w-12 h-12 bg-green-50 rounded-full flex items-center justify-center">
-            <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-        </div>
-    </div>
-    <div class="bg-white rounded-md p-5  border border-slate-200 flex items-center justify-between">
-        <div>
-            <p class="text-sm text-slate-500 font-medium">Suitable</p>
-            <p class="text-3xl font-bold text-amber-500 mt-1">{{ stats.suitable }}</p>
-        </div>
-        <div class="w-12 h-12 bg-amber-50 rounded-full flex items-center justify-center">
-            <svg class="w-6 h-6 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-        </div>
-    </div>
-    <div class="bg-white rounded-md p-5  border border-slate-200 flex items-center justify-between">
-        <div>
-            <p class="text-sm text-slate-500 font-medium">Low Match</p>
-            <p class="text-3xl font-bold text-red-500 mt-1">{{ stats.low_match }}</p>
-        </div>
-        <div class="w-12 h-12 bg-red-50 rounded-full flex items-center justify-center">
-            <svg class="w-6 h-6 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-        </div>
-    </div>
-</div>
-
-<div class="bg-white rounded-md  border border-slate-200 overflow-hidden fade-in-up">
+<div class="academic-card overflow-hidden mt-6">
     <!-- Header -->
     <div class="px-6 py-4 border-b border-slate-200 bg-slate-50 flex items-center justify-between">
-        <h3 class="font-semibold text-slate-900">Candidate Rankings</h3>
-        <div class="flex gap-2">
-            <a href="/export-csv" class="text-sm text-brand-600 bg-brand-50 hover:bg-brand-100 px-3 py-1.5 rounded font-medium transition-colors">
-                Download CSV
-            </a>
-            <span class="text-sm text-slate-500 bg-white px-3 py-1 rounded-full border border-gray-200">
-                Found {{ results|length }} candidates
+        <h3 class="font-display font-bold text-slate-950">Candidate Rankings</h3>
+        <div class="flex items-center gap-3">
+            <span class="inline-flex items-center gap-1.5 px-2 py-1 rounded-md text-[10px] font-mono font-bold text-brand-700 bg-brand-50 border border-brand-200">
+                <i class="fa-solid fa-microchip"></i> ENGINE {{ model_version|upper if model_version else 'V5' }}
             </span>
+            <div class="h-4 w-px bg-slate-300"></div>
+            <span class="text-xs font-mono font-bold uppercase text-slate-500 tracking-wider">
+                {{ results|length }} EVALUATED
+            </span>
+            <div class="h-4 w-px bg-slate-300"></div>
+            <a href="/export-csv" class="tactile-btn px-3 py-1.5 text-xs font-bold text-brand-700 flex items-center gap-1.5">
+                <i class="fa-solid fa-download"></i> Export
+            </a>
+            <a href="#screen" class="tactile-btn-primary px-3 py-1.5 text-xs flex items-center gap-1.5">
+                New Screening
+            </a>
         </div>
     </div>
 
@@ -47,112 +24,91 @@
     <div class="overflow-x-auto">
         <table class="w-full text-left border-collapse">
             <thead>
-                <tr class="bg-white text-xs uppercase text-slate-500 border-b border-slate-200">
-                    <th class="px-6 py-4 font-medium">Rank</th>
-                    <th class="px-6 py-4 font-medium">Candidate ID</th>
-                    <th class="px-6 py-4 font-medium">Match Score</th>
-                    <th class="px-6 py-4 font-medium">Exp (Yrs)</th>
-                    <th class="px-6 py-4 font-medium w-48">Skills Found</th>
-                    <th class="px-6 py-4 font-medium w-48">Missing Skills</th>
-                    <th class="px-6 py-4 font-medium">Category</th>
-                    <th class="px-6 py-4 font-medium text-center">Feedback</th>
+                <tr class="bg-white border-b border-slate-200 text-[10px] font-mono font-bold text-slate-500 uppercase tracking-wider">
+                    <th class="px-6 py-3">Rank / ID</th>
+                    <th class="px-6 py-3">Match Score</th>
+                    <th class="px-6 py-3">Category</th>
+                    <th class="px-6 py-3">Experience</th>
+                    <th class="px-6 py-3 w-1/4">Skills Found</th>
+                    <th class="px-6 py-3 w-1/4">Missing Skills</th>
+                    <th class="px-6 py-3 text-center">Feedback</th>
                 </tr>
             </thead>
-            <tbody class="divide-y divide-slate-200">
+            <tbody class="divide-y divide-slate-100">
                 {% for result in results %}
-                <tr class="hover:bg-slate-50 transition-colors">
-                    <!-- Rank -->
-                    <td class="px-6 py-4">
-                        {% if loop.index == 1 %}
-                        <span class="w-8 h-8 bg-amber-100 text-amber-700 rounded-full flex items-center justify-center font-bold text-sm">🏆</span>
-                        {% elif loop.index == 2 %}
-                        <span class="w-8 h-8 bg-slate-200 text-slate-700 rounded-full flex items-center justify-center font-bold text-sm">🥈</span>
-                        {% elif loop.index == 3 %}
-                        <span class="w-8 h-8 bg-orange-100 text-orange-800 rounded-full flex items-center justify-center font-bold text-sm">🥉</span>
-                        {% else %}
-                        <span class="w-8 h-8 bg-slate-50 text-slate-400 rounded-full flex items-center justify-center font-bold text-sm">#{{ loop.index }}</span>
-                        {% endif %}
-                    </td>
-
-                    <!-- Candidate ID -->
-                    <td class="px-6 py-4 font-medium text-slate-900 text-sm">
-                        {{ result.candidate_id }}
-                    </td>
-
-                    <!-- Match Score -->
-                    <td class="px-6 py-4 w-48">
-                        <div class="flex items-center gap-3">
-                            <div class="flex-1">
-                                <div class="w-full bg-slate-100 rounded-full h-2.5">
-                                    <div class="h-2.5 rounded-full score-bar-animated
-                                        {% if result.score >= 60 %}bg-green-500
-                                        {% elif result.score >= 38 %}bg-amber-500
-                                        {% else %}bg-red-400{% endif %}
-                                    " style="width: {{ result.score }}%"></div>
-                                </div>
-                            </div>
-                            <span class="font-bold text-sm w-12 text-right
-                                {% if result.score >= 60 %}text-green-700
-                                {% elif result.score >= 38 %}text-amber-700
-                                {% else %}text-red-600{% endif %}
-                            ">{{ result.score }}%</span>
+                <tr class="hover:bg-slate-50 transition-colors group">
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="flex items-center gap-2">
+                            <span class="w-6 h-6 rounded-md bg-slate-100 text-slate-600 font-mono font-bold text-xs flex items-center justify-center border border-slate-200">#{{ loop.index }}</span>
+                            <span class="text-sm font-bold text-slate-800">Candidate {{ loop.index }}</span>
                         </div>
-                        <div class="text-[10px] text-slate-400 mt-1">S:{{ result.sbert_score }} | T:{{ result.tfidf_score }}</div>
                     </td>
-
-                    <!-- Experience -->
-                    <td class="px-6 py-4 text-sm text-slate-600">
-                        {{ result.experience_years }}
-                    </td>
-
-                    <!-- Matched Skills -->
-                    <td class="px-6 py-4 text-xs text-slate-600">
-                        {% if result.matched_skills %}
-                            {{ result.matched_skills[:3]|join(', ') }}{% if result.matched_skills|length > 3 %}...{% endif %}
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="flex items-center gap-2">
+                            <span class="text-lg font-mono font-black text-slate-950">{{ "%.1f"|format(result.score) }}%</span>
+                            <div class="w-16 h-1.5 bg-slate-100 rounded-full overflow-hidden">
+                                <div class="h-full rounded-full transition-all duration-1000 
+                                    {% if result.label == 'Highly Suitable' %}bg-emerald-500
+                                    {% elif result.label == 'Suitable' %}bg-amber-500
+                                    {% else %}bg-red-500{% endif %}"
+                                    style="width: {{ result.score }}%"></div>
+                            </div>
+                        </div>
+                        {% if model_version != 'v1' %}
+                        <div class="text-[10px] text-slate-400 font-mono mt-0.5">SBERT: {{ "%.1f"|format(result.sbert_score) }}%</div>
                         {% else %}
-                            -
+                        <div class="text-[10px] text-slate-400 font-mono mt-0.5">TF-IDF Baseline</div>
                         {% endif %}
                     </td>
-
-                    <!-- Missing Skills -->
-                    <td class="px-6 py-4 text-xs text-red-500">
-                        {% if result.missing_skills %}
-                            {{ result.missing_skills[:3]|join(', ') }}{% if result.missing_skills|length > 3 %}...{% endif %}
-                        {% else %}
-                            -
-                        {% endif %}
-                    </td>
-
-                    <!-- Category Badge -->
-                    <td class="px-6 py-4">
+                    <td class="px-6 py-4 whitespace-nowrap">
                         {% if result.label == 'Highly Suitable' %}
-                        <span class="inline-flex items-center gap-1 px-3 py-1 bg-green-100 text-green-700 rounded-full text-xs font-semibold">
-                            <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
+                        <span class="inline-flex items-center px-2.5 py-1 rounded-md text-[10px] font-mono font-bold uppercase tracking-wider text-emerald-700 bg-emerald-50 border border-emerald-200">
                             Highly Suitable
                         </span>
                         {% elif result.label == 'Suitable' %}
-                        <span class="inline-flex items-center gap-1 px-3 py-1 bg-amber-100 text-amber-700 rounded-full text-xs font-semibold">
-                            <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/></svg>
+                        <span class="inline-flex items-center px-2.5 py-1 rounded-md text-[10px] font-mono font-bold uppercase tracking-wider text-amber-700 bg-amber-50 border border-amber-200">
                             Suitable
                         </span>
                         {% else %}
-                        <span class="inline-flex items-center gap-1 px-3 py-1 bg-red-100 text-red-700 rounded-full text-xs font-semibold">
-                            <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/></svg>
+                        <span class="inline-flex items-center px-2.5 py-1 rounded-md text-[10px] font-mono font-bold uppercase tracking-wider text-red-700 bg-red-50 border border-red-200">
                             Low Match
                         </span>
                         {% endif %}
                     </td>
-
-                    <!-- Feedback -->
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <span class="text-sm font-medium text-slate-700">{{ result.experience_years }} Years</span>
+                    </td>
+                    <td class="px-6 py-4">
+                        <div class="flex flex-wrap gap-1">
+                            {% for skill in result.matched_skills[:5] %}
+                            <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-mono font-semibold text-emerald-700 bg-emerald-50 border border-emerald-100">
+                                {{ skill }}
+                            </span>
+                            {% endfor %}
+                            {% if result.matched_skills|length > 5 %}
+                            <span class="text-[10px] text-slate-400 font-bold ml-1">+{{ result.matched_skills|length - 5 }}</span>
+                            {% endif %}
+                        </div>
+                    </td>
+                    <td class="px-6 py-4">
+                        <div class="flex flex-wrap gap-1">
+                            {% for skill in result.missing_skills[:5] %}
+                            <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-mono font-semibold text-red-700 bg-red-50 border border-red-100">
+                                {{ skill }}
+                            </span>
+                            {% endfor %}
+                            {% if result.missing_skills|length > 5 %}
+                            <span class="text-[10px] text-slate-400 font-bold ml-1">+{{ result.missing_skills|length - 5 }}</span>
+                            {% endif %}
+                        </div>
+                    </td>
                     <td class="px-6 py-4 text-center">
-                        <div class="flex items-center justify-center gap-2" id="feedback-{{ loop.index }}">
-                            <button type="button" onclick="sendFeedback('{{ result.candidate_id }}', 'up', this)"
-                                class="p-1.5 rounded-lg hover:bg-green-50 text-slate-400 hover:text-green-600 transition-colors" title="Good match">
-                                👍
+                        <div class="flex items-center justify-center gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <button onclick="sendFeedback('{{ result.candidate_id }}', 'up', this)" class="w-7 h-7 rounded bg-slate-50 border border-slate-200 text-slate-400 hover:text-emerald-600 hover:border-emerald-300 hover:bg-emerald-50 transition-colors flex items-center justify-center">
+                                <i class="fa-solid fa-thumbs-up text-[10px]"></i>
                             </button>
-                            <button type="button" onclick="sendFeedback('{{ result.candidate_id }}', 'down', this)"
-                                class="p-1.5 rounded-lg hover:bg-red-50 text-slate-400 hover:text-red-600 transition-colors" title="Bad match">
-                                👎
+                            <button onclick="sendFeedback('{{ result.candidate_id }}', 'down', this)" class="w-7 h-7 rounded bg-slate-50 border border-slate-200 text-slate-400 hover:text-red-600 hover:border-red-300 hover:bg-red-50 transition-colors flex items-center justify-center">
+                                <i class="fa-solid fa-thumbs-down text-[10px]"></i>
                             </button>
                         </div>
                     </td>
@@ -161,73 +117,63 @@
             </tbody>
         </table>
     </div>
+</div>
 
-    <!-- Score Distribution Chart -->
-    <div class="mt-6 bg-white rounded-md p-6 border-t border-slate-200">
-        <h4 class="font-semibold text-slate-900 mb-4">Score Distribution</h4>
-        <div style="max-height: 300px;">
-            <canvas id="score-chart"></canvas>
-        </div>
+<!-- Score Distribution Chart -->
+<div class="academic-card p-6 mt-6">
+    <h3 class="font-display font-bold text-slate-950 mb-4">Score Distribution</h3>
+    <div class="w-full h-64">
+        <canvas id="scoreChart"></canvas>
     </div>
 </div>
 
 <script>
-    // Build the score distribution chart
-    setTimeout(() => {
-        const ctx = document.getElementById('score-chart');
-        if (ctx) {
-            const labels = {{ labels | tojson | safe }};
-            const scores = {{ scores | tojson | safe }};
-            const colors = scores.map(s => s >= 60 ? '#22c55e' : (s >= 38 ? '#f59e0b' : '#ef4444'));
-            
-            new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: labels,
-                    datasets: [{
-                        label: 'Match Score (%)',
-                        data: scores,
-                        backgroundColor: colors,
-                        borderRadius: 6,
-                        borderSkipped: false,
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: true,
-                    plugins: {
-                        legend: { display: false },
-                    },
-                    scales: {
-                        y: { 
-                            beginAtZero: true, 
-                            max: 100,
-                            ticks: { callback: v => v + '%' },
-                            grid: { color: '#f1f5f9' }
-                        },
-                        x: {
-                            grid: { display: false }
-                        }
-                    }
-                }
-            });
-        }
-    }, 100);
-
-    // Feedback handler
-    function sendFeedback(candidateId, feedbackType, btn) {
+    function sendFeedback(resumeId, feedbackType, btn) {
         fetch('/feedback', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ candidate_id: candidateId, feedback: feedbackType })
+            body: JSON.stringify({ candidate_id: resumeId, feedback: feedbackType })
         })
         .then(res => res.json())
         .then(data => {
             if (data.status === 'success') {
                 const parent = btn.parentElement;
-                const emoji = feedbackType === 'up' ? '👍' : '👎';
-                const color = feedbackType === 'up' ? 'text-green-600' : 'text-red-600';
-                parent.innerHTML = `<span class="${color} text-sm font-medium">${emoji} Saved</span>`;
+                const icon = feedbackType === 'up' ? '<i class="fa-solid fa-check"></i>' : '<i class="fa-solid fa-xmark"></i>';
+                const color = feedbackType === 'up' ? 'text-emerald-600' : 'text-red-600';
+                parent.innerHTML = `<span class="${color} text-[10px] font-mono font-bold uppercase transition-all duration-300 scale-110">${icon} Saved</span>`;
+                setTimeout(() => {
+                    const span = parent.querySelector('span');
+                    if (span) span.classList.remove('scale-110');
+                }, 300);
+                parent.classList.remove('opacity-0');
+            }
+        });
+    }
+
+    // Chart.js initialization
+    const ctx = document.getElementById('scoreChart');
+    if (ctx) {
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: [{% for r in results %}'Candidate {{ loop.index }}'{% if not loop.last %}, {% endif %}{% endfor %}],
+                datasets: [{
+                    label: 'Match Score %',
+                    data: [{% for r in results %}{{ r.score }}{% if not loop.last %}, {% endif %}{% endfor %}],
+                    backgroundColor: '#1d4ed8',
+                    borderRadius: 4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: { beginAtZero: true, max: 100, grid: { color: '#f1f5f9' } },
+                    x: { grid: { display: false } }
+                },
+                plugins: {
+                    legend: { display: false }
+                }
             }
         });
     }

@@ -1,0 +1,182 @@
+:root {
+    --bg-primary: #090d16;
+    --bg-surface: #0f172a;
+    --bg-surface-elevated: #151f36;
+    --bg-surface-hover: #1e293b;
+    --border-subtle: #1e293b;
+    --border-strong: #334155;
+    
+    --accent: #10b981;
+    --accent-hover: #059669;
+    --accent-muted: rgba(16, 185, 129, 0.12);
+    --accent-border: rgba(16, 185, 129, 0.3);
+    
+    --text-primary: #f8fafc;
+    --text-secondary: #94a3b8;
+    --text-muted: #64748b;
+    
+    --radius-uniform: 0.75rem; /* Strict lock: rounded-xl */
+}
+
+/* Base resets & typography */
+body {
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+    font-family: 'Geist', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    line-height: 1.6;
+    overflow-x: hidden;
+}
+
+/* Subtle dot telemetry matrix */
+.cockpit-matrix {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: -1;
+    background-image: radial-gradient(rgba(148, 163, 184, 0.08) 1px, transparent 1px);
+    background-size: 24px 24px;
+}
+
+/* Locked Card Tokens */
+.cockpit-card {
+    background-color: var(--bg-surface);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-uniform);
+    box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.5);
+    transition: transform 0.18s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.18s ease, opacity 0.18s ease;
+}
+
+.cockpit-card-interactive:hover {
+    border-color: var(--border-strong);
+    transform: translateY(-2px);
+}
+
+/* Locked Input & Select */
+.cockpit-input {
+    background-color: rgba(15, 23, 42, 0.8);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-uniform);
+    color: var(--text-primary);
+    font-size: 0.875rem;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.cockpit-input:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-muted);
+}
+
+/* Locked Buttons: Single Line, Active Scale */
+.btn-primary-compact {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    background-color: var(--accent);
+    color: #041f14;
+    font-weight: 700;
+    font-size: 0.875rem;
+    padding: 0.625rem 1.25rem;
+    border-radius: var(--radius-uniform);
+    border: 1px solid transparent;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: transform 0.15s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.15s ease, opacity 0.15s ease;
+}
+
+.btn-primary-compact:hover {
+    background-color: var(--accent-hover);
+    color: #ffffff;
+    transform: translateY(-1px);
+}
+
+.btn-primary-compact:active {
+    transform: scale(0.98);
+}
+
+.btn-secondary-compact {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    background-color: var(--bg-surface-elevated);
+    color: var(--text-primary);
+    font-weight: 600;
+    font-size: 0.875rem;
+    padding: 0.625rem 1.25rem;
+    border-radius: var(--radius-uniform);
+    border: 1px solid var(--border-subtle);
+    cursor: pointer;
+    white-space: nowrap;
+    transition: transform 0.15s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.15s ease, background-color 0.15s ease;
+}
+
+.btn-secondary-compact:hover {
+    background-color: var(--bg-surface-hover);
+    border-color: var(--border-strong);
+    transform: translateY(-1px);
+}
+
+.btn-secondary-compact:active {
+    transform: scale(0.98);
+}
+
+/* Badge Lock */
+.badge-compact {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    padding: 0.25rem 0.625rem;
+    border-radius: var(--radius-uniform);
+    font-size: 0.75rem;
+    font-family: 'Geist Mono', monospace;
+    font-weight: 600;
+    border: 1px solid transparent;
+}
+
+.badge-accent {
+    background-color: var(--accent-muted);
+    border-color: var(--accent-border);
+    color: var(--accent);
+}
+
+.badge-neutral {
+    background-color: rgba(30, 41, 59, 0.6);
+    border-color: var(--border-subtle);
+    color: var(--text-secondary);
+}
+
+/* Drop Zone styling */
+.compact-drop-zone {
+    border: 2px dashed var(--border-strong);
+    border-radius: var(--radius-uniform);
+    background-color: rgba(15, 23, 42, 0.4);
+    transition: border-color 0.15s ease, background-color 0.15s ease;
+}
+
+.compact-drop-zone:hover, .compact-drop-zone.dragover {
+    border-color: var(--accent);
+    background-color: var(--accent-muted);
+}
+
+/* HTMX Loading States */
+.htmx-indicator {
+    display: none;
+}
+.htmx-request .htmx-indicator {
+    display: flex;
+}
+.htmx-request .htmx-hide-on-request {
+    display: none;
+}
+
+/* Strict prefers-reduced-motion fallback */
+@media (prefers-reduced-motion: reduce) {
+    *, ::before, ::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
+}

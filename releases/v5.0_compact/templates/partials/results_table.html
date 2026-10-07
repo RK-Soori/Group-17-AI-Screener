@@ -1,0 +1,288 @@
+<div id="results-cockpit" class="space-y-6">
+    <!-- Top Summary Banner & Filter Bar -->
+    <div class="cockpit-card p-5 border border-slate-800">
+        <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+            
+            <!-- Left: Batch Telemetry -->
+            <div class="flex flex-wrap items-center gap-3">
+                <span class="badge-compact badge-accent">
+                    <i class="fa-solid fa-microchip"></i> ENGINE {{ model_version|upper if model_version else 'V5.0' }}
+                </span>
+                <span class="text-xs font-mono text-slate-400">
+                    <strong class="text-white">{{ results|length }}</strong> CANDIDATES EVALUATED
+                </span>
+                <span class="text-slate-700 hidden sm:inline">•</span>
+                <span class="text-xs font-mono text-slate-400">
+                    AVG SCORE: <strong class="text-emerald-400">{{ stats.avg_score|default(0.0) }}%</strong>
+                </span>
+                <span class="text-slate-700 hidden sm:inline">•</span>
+                <span class="text-xs font-mono text-slate-400">
+                    TOP: <strong class="text-white">{{ stats.top_score|default(0.0) }}%</strong>
+                </span>
+            </div>
+
+            <!-- Right: Search & Actions -->
+            <div class="flex flex-wrap items-center gap-2">
+                <div class="relative">
+                    <input 
+                        type="text" 
+                        id="candidate-search" 
+                        placeholder="Filter by skill or ID..." 
+                        class="cockpit-input px-3 py-1.5 text-xs w-48 sm:w-56 pl-8"
+                        onkeyup="filterCandidateList()"
+                    >
+                    <i class="fa-solid fa-magnifying-glass absolute left-2.5 top-2.5 text-[10px] text-slate-500"></i>
+                </div>
+                
+                <a href="/export-csv" class="btn-secondary-compact text-xs py-1.5 px-3">
+                    <i class="fa-solid fa-file-arrow-down text-emerald-400"></i> Export CSV
+                </a>
+                
+                <a href="#screen" class="btn-primary-compact text-xs py-1.5 px-3">
+                    <i class="fa-solid fa-rotate-right"></i> Rescreen
+                </a>
+            </div>
+        </div>
+
+        <!-- Tier Filtering Pills -->
+        <div class="mt-4 pt-4 border-t border-slate-800/80 flex flex-wrap items-center gap-2 text-xs">
+            <span class="text-slate-500 font-mono text-[11px] uppercase mr-1">Tiers:</span>
+            <button onclick="filterByTier('all', this)" class="tier-pill active px-3 py-1 rounded-xl font-mono text-xs font-semibold bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 transition-colors">
+                All ({{ results|length }})
+            </button>
+            <button onclick="filterByTier('Highly Suitable', this)" class="tier-pill px-3 py-1 rounded-xl font-mono text-xs font-semibold bg-slate-900 text-slate-400 border border-slate-800 hover:border-slate-700 transition-colors">
+                Highly Suitable ({{ stats.highly_suitable|default(0) }})
+            </button>
+            <button onclick="filterByTier('Suitable', this)" class="tier-pill px-3 py-1 rounded-xl font-mono text-xs font-semibold bg-slate-900 text-slate-400 border border-slate-800 hover:border-slate-700 transition-colors">
+                Suitable ({{ stats.suitable|default(0) }})
+            </button>
+            <button onclick="filterByTier('Low Match', this)" class="tier-pill px-3 py-1 rounded-xl font-mono text-xs font-semibold bg-slate-900 text-slate-400 border border-slate-800 hover:border-slate-700 transition-colors">
+                Low Match ({{ stats.low_match|default(0) }})
+            </button>
+        </div>
+    </div>
+
+    <!-- Score Distribution & Threshold Telemetry Chart (Chart.js) -->
+    {% if results and results|length > 0 %}
+    <div class="cockpit-card p-5 border border-slate-800">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3">
+            <span class="font-mono text-xs font-bold text-white uppercase flex items-center gap-2">
+                <i class="fa-solid fa-chart-column text-emerald-400"></i> Score Distribution & Tier Telemetry
+            </span>
+            <div class="flex flex-wrap items-center gap-3 text-[10px] font-mono text-slate-400">
+                <span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-emerald-400 inline-block"></span> Highly Suitable (&gt;=60%)</span>
+                <span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-amber-400 inline-block"></span> Suitable (&gt;=38%)</span>
+                <span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-rose-400 inline-block"></span> Low Match (&lt;38%)</span>
+            </div>
+        </div>
+        <div class="h-44 sm:h-52 w-full relative">
+            <canvas id="scoreChart"></canvas>
+        </div>
+        <script id="results-chart-data" type="application/json">{"labels": {{ labels|tojson }}, "scores": {{ scores|tojson }}}</script>
+    </div>
+    {% endif %}
+
+    <!-- Candidate Cards / Table Matrix -->
+    <div class="space-y-3" id="candidate-rows">
+        {% for result in results %}
+        <div class="candidate-row cockpit-card p-5 border border-slate-800 hover:border-slate-700 transition-all" data-label="{{ result.label }}" data-text="{{ result.candidate_id }} {{ result.matched_skills|join(' ') }} {{ result.missing_skills|join(' ') }}">
+            <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+                
+                <!-- Rank, ID & Experience -->
+                <div class="flex items-start sm:items-center gap-3">
+                    <div class="w-8 h-8 rounded-xl bg-slate-900 border border-slate-800 flex items-center justify-center font-mono font-bold text-xs text-slate-300">
+                        #{{ loop.index }}
+                    </div>
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <span class="text-sm font-bold text-white">{{ result.candidate_id }}</span>
+                            {% if result.label == 'Highly Suitable' %}
+                            <span class="badge-compact bg-emerald-500/15 text-emerald-300 border-emerald-500/30 text-[10px]">
+                                <i class="fa-solid fa-circle-check text-[9px]"></i> Highly Suitable
+                            </span>
+                            {% elif result.label == 'Suitable' %}
+                            <span class="badge-compact bg-amber-500/15 text-amber-300 border-amber-500/30 text-[10px]">
+                                <i class="fa-solid fa-circle-half-stroke text-[9px]"></i> Suitable
+                            </span>
+                            {% else %}
+                            <span class="badge-compact bg-rose-500/15 text-rose-300 border-rose-500/30 text-[10px]">
+                                <i class="fa-solid fa-circle-xmark text-[9px]"></i> Low Match
+                            </span>
+                            {% endif %}
+                        </div>
+                        <div class="flex items-center gap-3 text-xs text-slate-400 mt-0.5">
+                            <span class="font-mono"><i class="fa-solid fa-briefcase text-slate-500 text-[10px]"></i> {{ result.experience_years }} Years Exp</span>
+                            <span>•</span>
+                            <span class="font-mono text-slate-500">SBERT {{ "%.1f"|format(result.sbert_score) }}%</span>
+                            <span>•</span>
+                            <span class="font-mono text-slate-500">TF-IDF {{ "%.1f"|format(result.tfidf_score) }}%</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Match Score Meter -->
+                <div class="flex items-center gap-4 min-w-[200px]">
+                    <div class="text-right flex-1 sm:flex-initial">
+                        <div class="text-xl font-mono font-black 
+                            {% if result.label == 'Highly Suitable' %}text-emerald-400
+                            {% elif result.label == 'Suitable' %}text-amber-400
+                            {% else %}text-rose-400{% endif %}">
+                            {{ "%.1f"|format(result.score) }}%
+                        </div>
+                        <div class="text-[10px] font-mono text-slate-500 uppercase">Ensemble Score</div>
+                    </div>
+
+                    <div class="w-24 sm:w-32 h-2 rounded-xl bg-slate-900 border border-slate-800 overflow-hidden">
+                        <div class="h-full rounded-xl transition-all duration-700
+                            {% if result.label == 'Highly Suitable' %}bg-emerald-400
+                            {% elif result.label == 'Suitable' %}bg-amber-400
+                            {% else %}bg-rose-400{% endif %}"
+                            style="width: {{ result.score }}%">
+                        </div>
+                    </div>
+
+                    <!-- Recruiter Feedback Buttons -->
+                    <div class="flex items-center gap-1 pl-2 border-l border-slate-800">
+                        <button 
+                            type="button"
+                            onclick="sendFeedback('{{ result.candidate_id }}', 'approve', this)"
+                            class="feedback-btn w-7 h-7 rounded-xl bg-slate-900 border border-slate-800 hover:border-emerald-500 hover:text-emerald-400 text-slate-400 flex items-center justify-center text-xs transition-colors"
+                            title="Approve / Accurate"
+                        >
+                            <i class="fa-solid fa-thumbs-up"></i>
+                        </button>
+                        <button 
+                            type="button"
+                            onclick="sendFeedback('{{ result.candidate_id }}', 'reject', this)"
+                            class="feedback-btn w-7 h-7 rounded-xl bg-slate-900 border border-slate-800 hover:border-rose-500 hover:text-rose-400 text-slate-400 flex items-center justify-center text-xs transition-colors"
+                            title="Dispute / Inaccurate"
+                        >
+                            <i class="fa-solid fa-thumbs-down"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Skills Breakdown & Diagnostic Pill Grid -->
+            <div class="mt-4 pt-3 border-t border-slate-800/80 grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
+                <!-- Matched Skills -->
+                <div>
+                    <span class="text-[10px] font-mono uppercase text-slate-500 font-bold block mb-1">
+                        Matched Skills ({{ result.matched_skills|length }})
+                    </span>
+                    <div class="flex flex-wrap gap-1.5">
+                        {% for skill in result.matched_skills %}
+                        <span class="badge-compact bg-emerald-500/10 text-emerald-300 border-emerald-500/20 text-[10px] py-0.5 px-2">
+                            <i class="fa-solid fa-check text-[8px]"></i> {{ skill }}
+                        </span>
+                        {% else %}
+                        <span class="text-xs text-slate-500 italic">No exact domain skills matched</span>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- Missing Skills -->
+                <div>
+                    <span class="text-[10px] font-mono uppercase text-slate-500 font-bold block mb-1">
+                        Missing Requisition Skills ({{ result.missing_skills|length }})
+                    </span>
+                    <div class="flex flex-wrap gap-1.5">
+                        {% for skill in result.missing_skills %}
+                        <span class="badge-compact bg-rose-500/10 text-rose-300/80 border-rose-500/20 text-[10px] py-0.5 px-2">
+                            <i class="fa-solid fa-xmark text-[8px]"></i> {{ skill }}
+                        </span>
+                        {% else %}
+                        <span class="text-xs text-emerald-400 font-mono">Full requisition coverage</span>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Deep Calibration Diagnostic Dropdown -->
+            <details class="mt-3 text-xs text-slate-400 group">
+                <summary class="cursor-pointer select-none font-mono text-[11px] text-slate-500 hover:text-emerald-400 flex items-center gap-1 transition-colors">
+                    <i class="fa-solid fa-chevron-right group-open:rotate-90 transition-transform text-[9px]"></i>
+                    <span>View Mathematical Telemetry & Vector Breakdown</span>
+                </summary>
+                <div class="mt-2 p-3 rounded-xl bg-slate-900/60 border border-slate-800 grid grid-cols-2 sm:grid-cols-4 gap-2 font-mono text-[11px]">
+                    <div>
+                        <span class="text-slate-500 block">SBERT Weight (65%)</span>
+                        <span class="text-slate-200 font-bold">{{ "%.2f"|format(result.sbert_score) }}%</span>
+                    </div>
+                    <div>
+                        <span class="text-slate-500 block">TF-IDF Weight (20%)</span>
+                        <span class="text-slate-200 font-bold">{{ "%.2f"|format(result.tfidf_score) }}%</span>
+                    </div>
+                    <div>
+                        <span class="text-slate-500 block">Taxonomy Affinity (15%)</span>
+                        <span class="text-slate-200 font-bold">{{ "%.2f"|format(result.skill_affinity) }}%</span>
+                    </div>
+                    <div>
+                        <span class="text-slate-500 block">Transfer Boost</span>
+                        <span class="text-emerald-400 font-bold">+{{ result.transfer_boost }}%</span>
+                    </div>
+                </div>
+            </details>
+        </div>
+        {% else %}
+        <div class="cockpit-card p-12 text-center border-dashed border-slate-800">
+            <i class="fa-solid fa-folder-open text-3xl text-slate-700 mb-3 block"></i>
+            <p class="text-sm font-medium text-slate-400">No candidates currently evaluated</p>
+            <p class="text-xs text-slate-600 mt-1">Submit a job description and resumes above to trigger the AI ensemble</p>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<script>
+    // Real-time client-side candidate search and filter
+    window.activeTierFilter = 'all';
+
+    window.applyCandidateFilters = function() {
+        const searchInput = document.getElementById('candidate-search');
+        const query = searchInput ? searchInput.value.toLowerCase().trim() : '';
+        const rows = document.querySelectorAll('.candidate-row');
+        rows.forEach(row => {
+            const rowLabel = row.getAttribute('data-label');
+            const rowText = (row.getAttribute('data-text') || '').toLowerCase();
+            const matchesTier = (window.activeTierFilter === 'all' || rowLabel === window.activeTierFilter);
+            const matchesSearch = (!query || rowText.includes(query));
+            row.style.display = (matchesTier && matchesSearch) ? '' : 'none';
+        });
+    };
+
+    window.filterCandidateList = function() {
+        window.applyCandidateFilters();
+    };
+
+    window.filterByTier = function(tier, btnEl) {
+        window.activeTierFilter = tier;
+        document.querySelectorAll('.tier-pill').forEach(btn => {
+            btn.className = 'tier-pill px-3 py-1 rounded-xl font-mono text-xs font-semibold bg-slate-900 text-slate-400 border border-slate-800 hover:border-slate-700 transition-colors';
+        });
+        if (btnEl) {
+            btnEl.className = 'tier-pill active px-3 py-1 rounded-xl font-mono text-xs font-semibold bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 transition-colors';
+        }
+        window.applyCandidateFilters();
+    };
+
+    window.sendFeedback = function(candidateId, type, btnEl) {
+        fetch('/feedback', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ candidate_id: candidateId, feedback: type })
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (btnEl) {
+                btnEl.classList.remove('text-slate-400', 'bg-slate-900');
+                if (type === 'approve') {
+                    btnEl.classList.add('bg-emerald-500/20', 'text-emerald-300', 'border-emerald-500');
+                } else {
+                    btnEl.classList.add('bg-rose-500/20', 'text-rose-300', 'border-rose-500');
+                }
+            }
+        })
+        .catch(err => console.error('Feedback failed:', err));
+    };
+</script>

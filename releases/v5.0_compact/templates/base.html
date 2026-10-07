@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en" class="dark scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}AI Candidate Screening Cockpit v5.0{% endblock %}</title>
+    
+    <meta name="description" content="AI-Based Job Candidate Screening and Recommendation System - Compact Edition">
+
+    <!-- Fonts: Geist Sans & Geist Mono -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;500;600;700&family=Geist:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- FontAwesome 6 Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Geist', 'system-ui', 'sans-serif'],
+                        display: ['Geist', 'system-ui', 'sans-serif'],
+                        mono: ['"Geist Mono"', 'monospace'],
+                    },
+                    colors: {
+                        brand: {
+                            500: '#10b981',
+                            600: '#059669',
+                            muted: 'rgba(16, 185, 129, 0.12)',
+                            border: 'rgba(16, 185, 129, 0.30)',
+                        },
+                        cockpit: {
+                            base: '#090d16',
+                            surface: '#0f172a',
+                            elevated: '#151f36',
+                            border: '#1e293b',
+                            borderStrong: '#334155',
+                        }
+                    },
+                    borderRadius: {
+                        'uniform': '0.75rem', /* 12px uniform lock */
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <!-- Custom Design Tokens & Reduced Motion Support -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/compact.css') }}">
+    
+    <!-- HTMX & Chart.js -->
+    <script src="https://unpkg.com/htmx.org@2.0.4"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+</head>
+<body class="antialiased min-h-[100dvh] flex flex-col bg-[#090d16] text-slate-100 selection:bg-emerald-500/30 selection:text-emerald-300">
+
+    <div class="cockpit-matrix"></div>
+
+    <!-- Desktop Navigation (Single-line, max height 64px) -->
+    <header class="sticky top-0 z-50 h-16 bg-[#090d16]/90 backdrop-blur-xl border-b border-slate-800/80">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-full flex items-center justify-between gap-4">
+            
+            <!-- Logo & Brand Strip -->
+            <a href="/" class="flex items-center gap-3 group focus:outline-none focus:ring-2 focus:ring-emerald-500/40 rounded-xl">
+                <div class="w-8 h-8 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400 group-hover:border-emerald-500 transition-colors">
+                    <i class="fa-solid fa-microchip text-sm"></i>
+                </div>
+                <div class="flex items-center gap-2">
+                    <span class="text-sm font-black font-mono tracking-tight text-white">
+                        TALENT<span class="text-emerald-400">.AI</span>
+                    </span>
+                    <span class="px-2 py-0.5 rounded-xl bg-slate-800/80 text-[10px] font-mono text-slate-400 border border-slate-700/60">
+                        v5.0-compact
+                    </span>
+                </div>
+            </a>
+
+            <!-- Single-Line Desktop Navigation Links -->
+            <nav id="desktop-nav" class="hidden md:flex items-center gap-1 p-1 rounded-xl bg-slate-900/80 border border-slate-800/80">
+                <a href="#hero" class="nav-link px-3.5 py-1.5 rounded-xl text-xs font-semibold text-slate-300 hover:text-white hover:bg-slate-800/60 transition-colors" data-target="hero">
+                    Overview
+                </a>
+                <a href="#screen" class="nav-link px-3.5 py-1.5 rounded-xl text-xs font-semibold text-slate-300 hover:text-white hover:bg-slate-800/60 transition-colors" data-target="screen">
+                    Cockpit
+                </a>
+                <a href="#architecture" class="nav-link px-3.5 py-1.5 rounded-xl text-xs font-semibold text-slate-300 hover:text-white hover:bg-slate-800/60 transition-colors" data-target="architecture">
+                    Architecture
+                </a>
+                <a href="#results" class="nav-link px-3.5 py-1.5 rounded-xl text-xs font-semibold text-slate-300 hover:text-white hover:bg-slate-800/60 transition-colors" data-target="results">
+                    Rankings
+                </a>
+            </nav>
+
+            <!-- Right Telemetry Strip & Mobile Toggle -->
+            <div class="flex items-center gap-3">
+                <div class="hidden sm:flex items-center gap-2">
+                    <span class="badge-compact badge-accent">
+                        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                        ONLINE
+                    </span>
+                    <a href="http://127.0.0.1:5000" target="_blank" rel="noopener noreferrer" class="badge-compact badge-neutral hover:border-slate-600 transition-colors" title="Open v4.1 classic UI in new tab">
+                        <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i> v4.1 Classic
+                    </a>
+                </div>
+                <button id="mobile-toggle-btn" class="md:hidden w-9 h-9 flex items-center justify-center rounded-xl bg-slate-900 border border-slate-800 text-slate-300 focus:outline-none" aria-label="Toggle navigation">
+                    <i class="fa-solid fa-bars text-sm"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Mobile Drawer -->
+        <div id="mobile-drawer" class="hidden md:hidden border-b border-slate-800 bg-[#090d16] px-4 py-3 space-y-1">
+            <a href="#hero" class="block px-3 py-2 rounded-xl text-xs font-medium text-slate-300 hover:bg-slate-800">Overview</a>
+            <a href="#screen" class="block px-3 py-2 rounded-xl text-xs font-medium text-slate-300 hover:bg-slate-800">Cockpit</a>
+            <a href="#architecture" class="block px-3 py-2 rounded-xl text-xs font-medium text-slate-300 hover:bg-slate-800">Architecture</a>
+            <a href="#results" class="block px-3 py-2 rounded-xl text-xs font-medium text-slate-300 hover:bg-slate-800">Rankings</a>
+            <a href="http://127.0.0.1:5000" target="_blank" class="block px-3 py-2 rounded-xl text-xs font-medium text-emerald-400 hover:bg-slate-800">Launch v4.1 Classic (Port 5000)</a>
+        </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="flex-1 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Global Footer -->
+    <footer class="w-full border-t border-slate-800/80 bg-[#090d16] py-6 text-xs text-slate-400">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div class="flex items-center gap-2">
+                <span class="font-mono font-bold text-slate-300">Group 17 - KDU Computing</span>
+                <span>•</span>
+                <span>AI Candidate Screening System</span>
+            </div>
+            <div class="flex items-center gap-4 text-slate-400">
+                <span>Hybrid SBERT MNRL + TF-IDF</span>
+                <span>•</span>
+                <span>Compact UI Protocol</span>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Shared Navigation & Telemetry Script -->
+    <script>
+        // Mobile navigation toggle
+        const toggleBtn = document.getElementById('mobile-toggle-btn');
+        const mobileDrawer = document.getElementById('mobile-drawer');
+        if (toggleBtn && mobileDrawer) {
+            toggleBtn.addEventListener('click', () => {
+                mobileDrawer.classList.toggle('hidden');
+            });
+            mobileDrawer.querySelectorAll('a').forEach(link => {
+                link.addEventListener('click', () => mobileDrawer.classList.add('hidden'));
+            });
+        }
+
+        // Active navigation state update
+        function setActiveNav(sectionId) {
+            document.querySelectorAll('.nav-link').forEach(link => {
+                if (link.getAttribute('data-target') === sectionId) {
+                    link.className = 'nav-link px-3.5 py-1.5 rounded-xl text-xs font-bold text-emerald-400 bg-emerald-500/10 border border-emerald-500/30 transition-colors';
+                } else {
+                    link.className = 'nav-link px-3.5 py-1.5 rounded-xl text-xs font-semibold text-slate-300 hover:text-white hover:bg-slate-800/60 transition-colors';
+                }
+            });
+        }
+
+        // Smooth scroll hash tracking
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                const target = document.getElementById(this.getAttribute('href').substring(1));
+                if (target) {
+                    e.preventDefault();
+                    target.scrollIntoView({ behavior: 'smooth' });
+                    history.pushState(null, null, this.getAttribute('href'));
+                    setActiveNav(this.getAttribute('href').substring(1));
+                }
+            });
+        });
+
+        // Scrollspy
+        const sections = ['hero', 'screen', 'architecture', 'results'];
+        window.addEventListener('scroll', () => {
+            const scrollPos = window.scrollY + 200;
+            sections.forEach(id => {
+                const el = document.getElementById(id);
+                if (el && el.offsetTop <= scrollPos && (el.offsetTop + el.offsetHeight) > scrollPos) {
+                    setActiveNav(id);
+                }
+            });
+        }, { passive: true });
+    </script>
+</body>
+</html>

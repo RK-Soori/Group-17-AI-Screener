@@ -8,57 +8,64 @@ from sklearn.metrics.pairwise import cosine_similarity
 from sentence_transformers import SentenceTransformer
 
 # ==============================================================================
-# AI RESUME MATCHING ENGINE - VERSION 5.0 (REAL-WORLD ROBUSTNESS RELEASE)
+# AI RESUME MATCHING ENGINE - COMPACT EDITION (V5.0)
 # ==============================================================================
-# Features:
-# 1. Expanded Domain Skill Ontology (143+ industry skills across 4 core domains)
-# 2. Robust Multi-Span Date Range & Experience Parser (YYYY-YYYY, YYYY-Present)
-# 3. Sliding-Window Document Chunking with Max-Pooling SBERT Representation
-# 4. Calibrated Cross-Domain Career Transferability Matrix
-# 5. Baseline Floor Rescaling (0.15 floor removal) & Zero-Match Technical Gatekeeper
+# Dynamic path resolver to locate model artifacts locally or from v4.1/web_app
 # ==============================================================================
 
-# Load pre-fitted Domain TF-IDF model if available
-TFIDF_MODEL_PATH = os.path.join(os.path.dirname(__file__), "domain_tfidf_model.pkl")
+def resolve_asset_path(filename):
+    """Resolve model asset path across current directory, v4.1, and web_app root."""
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+    candidates = [
+        os.path.join(current_dir, filename),
+        os.path.join(current_dir, "..", "v4.1", filename),
+        os.path.join(current_dir, "..", "..", filename),
+        os.path.join(current_dir, "..", filename)
+    ]
+    for p in candidates:
+        if os.path.exists(p):
+            return os.path.abspath(p)
+    return os.path.join(current_dir, filename)
+
+TFIDF_MODEL_PATH = resolve_asset_path("domain_tfidf_model.pkl")
 domain_tfidf_model = None
 if os.path.exists(TFIDF_MODEL_PATH):
     try:
         domain_tfidf_model = joblib.load(TFIDF_MODEL_PATH)
-        print(f"Loaded Domain TF-IDF Model from {TFIDF_MODEL_PATH}")
+        print(f"[v5.0_compact] Loaded Domain TF-IDF Model from {TFIDF_MODEL_PATH}")
     except Exception as e:
-        print(f"Could not load domain TF-IDF model: {e}")
+        print(f"[v5.0_compact] Warning: Could not load domain TF-IDF model: {e}")
 
-# Lazily loaded SentenceTransformer model
 sbert_model = None
 
 def get_sbert():
     global sbert_model
     if sbert_model is None:
-        fine_tuned_path = os.path.join(os.path.dirname(__file__), "final-hr-model")
+        fine_tuned_path = resolve_asset_path("final-hr-model")
         if os.path.exists(fine_tuned_path):
-            print(f"Loading Fine-Tuned Domain SBERT Model from {fine_tuned_path}...")
+            print(f"[v5.0_compact] Loading Fine-Tuned Domain SBERT Model from {fine_tuned_path}...")
             try:
                 sbert_model = SentenceTransformer(fine_tuned_path)
-                print("Fine-Tuned SBERT Loaded Successfully!")
+                print("[v5.0_compact] Fine-Tuned SBERT Loaded Successfully!")
             except Exception as e:
-                print(f"Error loading fine-tuned model: {e}, falling back to base model.")
+                print(f"[v5.0_compact] Fallback: {e}, using all-MiniLM-L6-v2")
                 sbert_model = SentenceTransformer('all-MiniLM-L6-v2')
         else:
-            print("Downloading/Loading Base Semantic Model (all-MiniLM-L6-v2)...")
+            print("[v5.0_compact] Loading Base Semantic Model (all-MiniLM-L6-v2)...")
             try:
                 sbert_model = SentenceTransformer('all-MiniLM-L6-v2')
-                print("Base Model Loaded Successfully!")
+                print("[v5.0_compact] Base Model Loaded Successfully!")
             except Exception as e:
-                print(f"Error loading SBERT: {e}")
+                print(f"[v5.0_compact] Error loading SBERT: {e}")
     return sbert_model
 
-# Domain-specific HR stopwords
+# Domain HR stopwords
 HR_STOPWORDS = {
     'passionate', 'seeking', 'opportunity', 'team', 'player', 'responsibilities', 
     'duties', 'highly', 'motivated', 'driven', 'excellent', 'skills'
 }
 
-# [v5.0] Expanded Semantic Skill Clusters (143+ Skills across 4 Engineering Domains)
+# Expanded Semantic Skill Clusters (143+ Skills across 4 Core Engineering Domains)
 SKILL_CLUSTERS = {
     'ai_data': {
         'python', 'machine learning', 'data science', 'deep learning', 'pytorch', 
@@ -91,20 +98,18 @@ SKILL_CLUSTERS = {
     }
 }
 
-# The complete universe of recognized technical competencies
 CORE_SKILLS = set().union(*SKILL_CLUSTERS.values())
 
-# [v5.0] Cross-Domain Career Transferability Matrix
 TRANSFER_PAIRS = [
     # Data Analyst / BI -> AI / Machine Learning (+20.0%)
     (re.compile(r'\bdata\s*analyst\b|\bdata\s*analytics\b|\bbi\s*analyst\b', re.I),
      re.compile(r'\bai\b|\bmachine\s*learning\b|\bdata\s*science\b', re.I), 20.0),
     
-    # Backend Engineer -> Frontend / Fullstack (+7.5% - Shared APIs, Git, Databases)
+    # Backend Engineer -> Frontend / Fullstack (+7.5%)
     (re.compile(r'\bbackend\b|\bjava\b|\bspring\b|\b\.net\b', re.I),
      re.compile(r'\bfrontend\b|\breact\b|\bweb\b', re.I), 7.5),
 
-    # Sysadmin / IT Admin -> DevOps / Cloud (+4.0% - Linux, Shell scripting, Network admin)
+    # Sysadmin / IT Admin -> DevOps / Cloud (+4.0%)
     (re.compile(r'\bsysadmin\b|\bsystem\s*administrator\b|\blinux\s*admin\b', re.I),
      re.compile(r'\bdevops\b|\bcloud\b', re.I), 4.0),
 ]
@@ -115,11 +120,7 @@ SYNONYMS = {
 }
 
 def extract_years_experience(text):
-    """
-    [v5.0] Robust multi-strategy experience extractor:
-    1. Explicit mentions: '5+ years', '3 yrs experience'
-    2. Date ranges: '2018 - 2022', '2019 - Present'
-    """
+    """Extract cumulative years of experience via mentions or date ranges."""
     text_l = text.lower()
     explicit = re.findall(r'(\d+)\s*(?:\+)?\s*(?:years?|yrs?)', text_l)
     valid_explicit = [int(x) for x in explicit if 1 <= int(x) <= 35]
@@ -144,9 +145,8 @@ def extract_years_experience(text):
     return max(exp_explicit, exp_dates)
 
 def preprocess_text_for_tfidf(text):
-    """Clean text specifically for TF-IDF with keyword reinforcement"""
+    """Clean text specifically for TF-IDF with domain token reinforcement."""
     text = text.lower()
-    
     for key, val in SYNONYMS.items():
         text = re.sub(r'\b' + key + r'\b', val, text)
         
@@ -159,7 +159,7 @@ def preprocess_text_for_tfidf(text):
     return ' '.join(clean_tokens)
 
 def jaccard_similarity(doc1, doc2):
-    """Calculates Jaccard Similarity (intersection over union)"""
+    """Calculates Jaccard Similarity between token sets."""
     set1 = set(doc1.split())
     set2 = set(doc2.split())
     if not set1 or not set2:
@@ -169,9 +169,7 @@ def jaccard_similarity(doc1, doc2):
     return len(intersection) / len(union)
 
 def chunk_text(text, max_words=140, overlap=35):
-    """
-    [v5.0] Sliding-window text chunker to overcome SBERT 256-token truncation
-    """
+    """Sliding-window text chunker to overcome SBERT 256-token truncation."""
     words = text.split()
     if len(words) <= max_words:
         return [text]
@@ -185,17 +183,31 @@ def chunk_text(text, max_words=140, overlap=35):
 
 def calculate_match_scores(job_desc, resumes, model_version="v5"):
     """
-    [v5.0] Production AI Ensemble Screening Engine
+    [v5.0 Compact] Production AI Ensemble Screening Engine
+    Returns ranked candidate diagnostics with full explainability.
     """
     if not job_desc or not resumes:
         return []
     
+    # Extract candidate IDs and resume texts robustly
+    cand_ids = []
+    resume_texts = []
+    for idx, item in enumerate(resumes):
+        if isinstance(item, dict):
+            cid = item.get('name') or item.get('candidate_id') or item.get('id') or f"Candidate {idx + 1}"
+            ctext = item.get('text') or item.get('content') or ''
+        else:
+            cid = f"Candidate {idx + 1}"
+            ctext = str(item) if item is not None else ''
+        cand_ids.append(str(cid).strip())
+        resume_texts.append(ctext)
+
     # 1. Experience Requirements
     job_exp_req = extract_years_experience(job_desc)
     
     # 2. TF-IDF Lexical Processing
     processed_job = preprocess_text_for_tfidf(job_desc)
-    processed_resumes = [preprocess_text_for_tfidf(r) for r in resumes]
+    processed_resumes = [preprocess_text_for_tfidf(r) for r in resume_texts]
     
     if domain_tfidf_model is not None:
         job_tfidf = domain_tfidf_model.transform([processed_job])
@@ -210,13 +222,16 @@ def calculate_match_scores(job_desc, resumes, model_version="v5"):
     cosine_sim_tfidf = cosine_similarity(job_tfidf, resume_tfidf).flatten()
     
     # 3. Fine-Tuned SBERT Semantic Processing with Sliding-Window Chunking
-    sbert_scores = [0.0] * len(resumes)
+    sbert_scores = [0.0] * len(resume_texts)
     if model_version in ['v3', 'v5']:
         model = get_sbert()
         job_embedding = model.encode([job_desc])
         
         sbert_scores = []
-        for r in resumes:
+        for r in resume_texts:
+            if not r.strip():
+                sbert_scores.append(0.0)
+                continue
             r_chunks = chunk_text(r)
             if len(r_chunks) == 1:
                 emb = model.encode([r])
@@ -232,13 +247,13 @@ def calculate_match_scores(job_desc, resumes, model_version="v5"):
     job_skills = {s for s in CORE_SKILLS if re.search(r'\b' + re.escape(s) + r'\b', job_desc.lower())}
     
     results = []
-    for i in range(len(resumes)):
+    for i in range(len(resume_texts)):
         jac_score = jaccard_similarity(processed_job, processed_resumes[i])
-        
-        cand_skills = {s for s in CORE_SKILLS if re.search(r'\b' + re.escape(s) + r'\b', resumes[i].lower())}
+        cand_skills = {s for s in CORE_SKILLS if re.search(r'\b' + re.escape(s) + r'\b', resume_texts[i].lower())}
         
         # Bounded Skill Cluster Taxonomy Affinity
         skill_affinity = 0.0
+        exact_matches = set()
         if job_skills:
             exact_matches = job_skills.intersection(cand_skills)
             cluster_credits = 0.0
@@ -248,13 +263,11 @@ def calculate_match_scores(job_desc, resumes, model_version="v5"):
                 cluster_credits += min(len(job_in_cl), len(cand_in_cl)) * 0.5
             skill_affinity = (len(exact_matches) * 1.0 + cluster_credits) / len(job_skills)
         
-        # 5. Hybrid Blended Score based on Version
-        percentage = 0.0
-        
-        cand_exp = extract_years_experience(resumes[i])
+        cand_exp = extract_years_experience(resume_texts[i])
+        transfer_boost = 0.0
         
         if model_version == 'v1':
-            # V1: Pure TF-IDF, No Calibration, No Gatekeeper
+            # V1: Pure TF-IDF Baseline
             percentage = float(cosine_sim_tfidf[i]) * 100.0
             
         elif model_version == 'v3':
@@ -263,38 +276,37 @@ def calculate_match_scores(job_desc, resumes, model_version="v5"):
             BASELINE_FLOOR = 0.22
             calibrated_score = max(0.0, (raw_blended - BASELINE_FLOOR) / (1.0 - BASELINE_FLOOR))
             percentage = calibrated_score * 100.0
-            
-            # Legacy Experience Bonus
             if job_exp_req > 0 and cand_exp >= job_exp_req:
                 percentage += 10.0
                 
         else:
-            # V5: Current Production
+            # V5: Production Ensemble (65% SBERT, 20% TF-IDF, 15% Taxonomy)
             raw_blended = (sbert_scores[i] * 0.65) + (cosine_sim_tfidf[i] * 0.20) + (skill_affinity * 0.15)
             
-            # Baseline Floor Rescaling (0.15 floor removal)
+            # Baseline Floor Rescaling
             BASELINE_FLOOR = 0.15
             calibrated_score = max(0.0, (raw_blended - BASELINE_FLOOR) / (1.0 - BASELINE_FLOOR))
             percentage = calibrated_score * 100.0
             
-            # 6. Dynamic Experience Bonus
+            # Dynamic Experience Bonus
             if job_exp_req > 0 and cand_exp >= job_exp_req:
                 relevance_factor = min(1.0, (calibrated_score ** 0.5))
                 percentage += 15.0 * relevance_factor
             
-            # 7. Cross-Domain Career Transferability Index
+            # Cross-Domain Career Transferability Index
             for cand_pat, job_pat, boost_val in TRANSFER_PAIRS:
-                if cand_pat.search(resumes[i]) and job_pat.search(job_desc):
+                if cand_pat.search(resume_texts[i]) and job_pat.search(job_desc):
                     percentage += boost_val
+                    transfer_boost = boost_val
                     break
                     
-            # 8. Technical Gatekeeper (Hard zero if no technical skills)
+            # Technical Gatekeeper
             if not cand_skills:
                 percentage = 0.0
         
-        percentage = round(min(percentage, 100.0), 2)
+        percentage = round(float(min(percentage, 100.0)), 2)
         
-        # 9. Decision Thresholds
+        # Decision Tiers
         if percentage >= 60.0:
             result_label = "Highly Suitable"
         elif percentage >= 38.0:
@@ -303,18 +315,17 @@ def calculate_match_scores(job_desc, resumes, model_version="v5"):
             result_label = "Low Match"
             
         results.append({
-            'candidate_id': f"Candidate {i + 1}",
+            'candidate_id': cand_ids[i],
             'score': percentage,
             'label': result_label,
-            'sbert_score': round(sbert_scores[i] * 100, 2),
-            'tfidf_score': round(cosine_sim_tfidf[i] * 100, 2),
-            'skill_affinity': round(skill_affinity * 100, 2),
-            'matched_skills': list(exact_matches) if job_skills else [],
-            'missing_skills': list(job_skills - cand_skills) if job_skills else [],
-            'experience_years': cand_exp
+            'sbert_score': round(float(sbert_scores[i] * 100), 2),
+            'tfidf_score': round(float(cosine_sim_tfidf[i] * 100), 2),
+            'skill_affinity': round(float(skill_affinity * 100), 2),
+            'matched_skills': sorted(list(exact_matches)) if job_skills else [],
+            'missing_skills': sorted(list(job_skills - cand_skills)) if job_skills else [],
+            'experience_years': cand_exp,
+            'transfer_boost': transfer_boost
         })
     
-    # Sort results highest score to lowest
     results.sort(key=lambda x: x['score'], reverse=True)
     return results
-

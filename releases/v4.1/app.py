@@ -3,7 +3,7 @@ import os
 import io
 import json
 import csv
-from flask import Flask, render_template, request, jsonify, session, Response
+from flask import Flask, render_template, request, jsonify, session, Response, redirect
 from nlp_engine import calculate_match_scores
 
 # PDF and DOCX text extraction
@@ -27,7 +27,8 @@ def load_results():
         'results': [],
         'stats': {'highly_suitable': 0, 'suitable': 0, 'low_match': 0},
         'labels': [],
-        'scores': []
+        'scores': [],
+        'model_version': 'v5'
     }
 
 def save_results(data):
@@ -75,27 +76,26 @@ def extract_text_from_docx(file_stream):
 
 @app.route('/')
 def dashboard():
-    """Dashboard / Home page with system overview and stats."""
-    return render_template('dashboard.html', active_page='dashboard')
-
-@app.route('/screen')
-def screen():
-    """Screening page with job description input and resume upload."""
-    return render_template('screen.html', active_page='screen')
-
-@app.route('/results')
-def results():
-    """Results page showing the last screening results."""
-    # Reload from disk just in case
+    """Dashboard / Single-Page scrollable app with all sections."""
     global last_results
     last_results = load_results()
-    
-    return render_template('results.html',
-                           active_page='results',
+    return render_template('dashboard.html',
+                           active_page='dashboard',
                            results=last_results['results'],
                            stats=last_results['stats'],
                            labels=last_results['labels'],
-                           scores=last_results['scores'])
+                           scores=last_results['scores'],
+                           model_version=last_results.get('model_version', 'v5'))
+
+@app.route('/screen')
+def screen():
+    """Redirect to the scrollable screen section on the main page."""
+    return redirect('/#screen')
+
+@app.route('/results')
+def results():
+    """Redirect to the scrollable results section on the main page."""
+    return redirect('/#results')
 
 @app.route('/upload', methods=['POST'])
 def upload():
@@ -132,6 +132,7 @@ def score():
     data = request.get_json(force=True)
     job_desc = data.get('job_desc', '')
     resumes = data.get('resumes', [])
+    model_version = data.get('model_version', 'v5')
 
     if not job_desc or len(job_desc) < 20:
         return '<div class="text-center py-8 text-red-500 font-medium">Please provide a valid job description (at least 20 characters).</div>', 400
@@ -143,7 +144,7 @@ def score():
         return '<div class="text-center py-8 text-red-500 font-medium">Maximum 50 resumes allowed per batch to prevent server overload.</div>', 400
 
     # Run the AI matching engine
-    results = calculate_match_scores(job_desc, resumes)
+    results = calculate_match_scores(job_desc, resumes, model_version=model_version)
 
     # Sort by score descending
     results.sort(key=lambda x: x['score'], reverse=True)
@@ -163,7 +164,8 @@ def score():
         'results': results,
         'stats': stats,
         'labels': labels,
-        'scores': scores
+        'scores': scores,
+        'model_version': model_version
     }
     save_results(last_results)
 
@@ -244,4 +246,4 @@ def legacy():
     return render_template('index.html')
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(host='0.0.0.0', port=5000, debug=True, use_reloader=False)

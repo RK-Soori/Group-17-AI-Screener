@@ -1,0 +1,47 @@
+[
+  {
+    "candidate_id": "Candidate 1",
+    "feedback": "approve",
+    "timestamp": "2026-10-07T13:23:13.732749"
+  },
+  {
+    "candidate_id": "Candidate 1",
+    "feedback": "approve",
+    "timestamp": "2026-10-07T13:24:05.654889"
+  },
+  {
+    "candidate_id": "Candidate 1",
+    "feedback": "approve",
+    "timestamp": "2026-10-07T13:25:41.558750"
+  },
+  {
+    "candidate_id": "Candidate 1",
+    "feedback": "approve",
+    "timestamp": "2026-10-07T13:28:11.478283"
+  },
+  {
+    "candidate_id": "Candidate 1",
+    "feedback": "approve",
+    "timestamp": "2026-10-07T13:38:24.218082"
+  },
+  {
+    "candidate_id": "Candidate 1",
+    "feedback": "approve",
+    "timestamp": "2026-10-07T13:43:57.995306"
+  },
+  {
+    "candidate_id": "Candidate 1",
+    "feedback": "approve",
+    "timestamp": "2026-10-07T19:12:57.616972"
+  },
+  {
+    "candidate_id": "Candidate 1",
+    "feedback": "approve",
+    "timestamp": "2026-10-07T20:12:42.303752"
+  },
+  {
+    "candidate_id": "Candidate 1",
+    "feedback": "approve",
+    "timestamp": "2026-10-07T20:14:56.455826"
+  }
+]
